@@ -6,11 +6,11 @@ plot(data(:,1), data(:,2));
 axis([0, 8*pi, -3, 3]);
 legend('original data');
 grid on;
-
+print('Please press ENTER to continue...')
 pause;
 
 clf
-hold on;
+hold on;    
 
 data_length = length(data)
 for idx = 1500:2000
@@ -18,7 +18,7 @@ for idx = 1500:2000
 end;
 plot(data(:,1), data(:,2));
 axis([0, 8*pi, -3, 3]);
-legend('human modified data');
+legend('human modified data');  
 grid on;
 
 pause;

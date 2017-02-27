@@ -1,7 +1,8 @@
 % Note the parameter refers origin code from
 % http://www.cs.ucr.edu/~eamonn/selected_publications.htm
 
-[C, C_index, C_dist] = DC('../DC_data/lightcurves/TS', 2, '.txt', 10, 10);
+%[C, C_index, C_dist] = DC('../DC_data/lightcurves/TS', 2, '.txt', 10, 10);
+[C, C_index, C_dist] = DC('UCR_TS_Archive_2015/StarLightCurves/', 2, '.txt', 10, 10);
 
 for i = 1:size(C,1)
     figure;

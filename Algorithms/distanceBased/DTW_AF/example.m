@@ -1,9 +1,11 @@
 currentPath = cd;
-cd ../..;
+cd ../../..;
 rootPath = cd;
 cd util;
-[ normalSeqCell ] = cellReader( [rootPath '\benchmarks\Time Series Data\Synthetic Wave\normalSeqs.data.csv'] );
-[ unseenSeqCell ] = cellReader( [rootPath '\benchmarks\Time Series Data\Synthetic Wave\unseenSeqs.data.csv'] );
+%[ normalSeqCell ] = cellReader( [rootPath '\benchmarks\Time Series Data\Synthetic Wave\normalSeqs.data.csv'] );
+%[ unseenSeqCell ] = cellReader( [rootPath '\benchmarks\Time Series Data\Synthetic Wave\unseenSeqs.data.csv'] );
+[ normalSeqCell ] = cellReader( strcat(rootPath, '/benchmarks/Time Series Data/Synthetic Wave/normalSeqs.data.csv') );
+[ unseenSeqCell ] = cellReader( strcat(rootPath, '/benchmarks/Time Series Data/Synthetic Wave/unseenSeqs.data.csv') );
 
 figure;
 title('Part of Concatenated Normal Synthetic Waves')
@@ -16,6 +18,7 @@ plot(s);
 axisNormal =axis;
 axis([axisNormal(1) axisNormal(2) axisNormal(3) axisNormal(4)*2.0])
 cd(currentPath);
+
 tic
 [score  ] = DTW_AF( unseenSeqCell(1),normalSeqCell,5 ) % it is heavy to compute median of k-distance
 figure;
@@ -31,6 +34,7 @@ disp(['Anomaly score of unseen synthetic wave 1 (normal) is ' num2str(score)])
 toc
 tic
 [score  ] = DTW_AF( unseenSeqCell(38),normalSeqCell,5 ) % it is heavy to compute median of k-distance
+
 figure;
 hold on;
 title('Unseen Synthetic Wave 38 (abnormal)')
