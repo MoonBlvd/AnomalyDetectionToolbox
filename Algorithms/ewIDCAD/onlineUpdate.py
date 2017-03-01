@@ -1,8 +1,8 @@
-import numpy as np
 from __future__ import division
+import numpy as np
 
 class onlineUpdate():
-    def update(alpha, beta, chi = 0, _lambda, k, m, cov_inv, x):
+    def update(alpha, beta, chi, _lambda, k, m, cov_inv, x):
         # here x should be 1*W array where W is the number of features
 
         # update parameters
