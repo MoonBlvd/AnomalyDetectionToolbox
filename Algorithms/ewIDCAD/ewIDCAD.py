@@ -1,7 +1,16 @@
 import numpy as np
 import csv
-from onlineUpdate import onlineUpdator
-from classifier import anomalyDetector
+from clusters import cluster
+import matplotlib.pyplot as plt
+
+def find_min_distance(clusters, new_instance):
+    min_distance = np.inf
+    for i in range (0, len(clusters)):
+        distance = clusters[i].compute_distance(new_instance)    
+        if distance < min_distance:
+            min_distance = distance
+            min_index = i
+    return min_distance, min_index
 
 def dataReader(file_path):
     # The read-in data should be a N*W matrix,
@@ -20,11 +29,16 @@ def dataReader(file_path):
     return data
 
 if __name__ == '__main__':
-    file_path = '../../../circularDataProcess/data/'
+    file_path = '../../Benchmarks/Time Series Data/'
     file_name = 'simulating_data_ECG.csv'
     #file_path = '../../Benchmarks/Time Series Data/Intel Lab Data/Temperature/'
     #file_name = 'normalSeqs_data.csv'
     normal_data = dataReader(file_path + file_name)
+    normal_data = normal_data[:,2:4]
+    #print normal_data.shape
+    #normal_data = np.append(normal_data, normal_data[:,[0]]**2, 1)
+    #normal_data = np.append(normal_data, normal_data[:,[1]]**2, 1)
+    print normal_data
     num_seqs, num_sensors = normal_data.shape
     
     # Parameters configuration
@@ -40,44 +54,31 @@ if __name__ == '__main__':
     mean = init_samples.mean(axis = 0)
     cov = np.cov(init_samples.T)
     #print cov
-    cov_inv = np.linalg.inv(cov) # We update the inverse of the covariance in practice!
-    #print cov_inv
-    clusters = [] # a list of arries, each array stores instances of one cluster
-    clusters_means = [] # a list of cluster means
-    clusters_cov_invs = [] # a list of the inverses of cluster covariances
-    chi_square_dists = [] # a list of the chi square distance of each cluster
-
-    clsuters.append(init_samples)
-    chi_square_dists.append()
-    clusters_means.append(mean) 
-    clusters_cov_invs.append(cov_inv)
 
     # initialize the online updator 
-    updators = []
-    updators.append(onlineUpdator(alpha, beta, _lambda, mean, cov_inv))
-    # initialize the classifier
-    classifier = anomalyDetector(gamma)
+    clusters = []
+    clusters.append(cluster(init_samples, alpha, beta, _lambda, mean, cov, gamma))
     print "Start update from the ", k, "th instance to the ", num_seqs,"th instance" 
     for i in range(k, num_seqs):
         print 'Iteration ', i-k
-        new_instance = normal_data[i]
+        new_instance = normal_data[i][:]
         # classify the new instance, f is the cluster label
-        f = classifier.classify(clusters_means, clusters_cov_invs, new_instance)
-        if f == False: # need a new cluster
-            clusters.append(new_instance) # add new cluster
-            clusters_means.append(new_instance) # add new instance as the mean of new cluster
-            clusters_cov_invs.append(np.ones([num_sensors, num_sensors]))
-            updators.append(onlineUpdator(alpha, beta, _lambda, 
-                new_instance, np.ones([num_sensors, num_sensors])))
-            clusters.append(new_instance)
-        else: # update ohe existing cluster
-            mean, cov_inv = updators[f].update(i, new_instance)
-            cluster[f] = np.vstack(clusters[f], new_instance)
-            clusters_means[f] = mean
-            clusters_cov_invs[f] = cov_inv
-    #print clusters_means
-    print '# of clusters is: ', len(clusters_means)
+        distance, index = find_min_distance(clusters, new_instance)
+        f = clusters[index].classify(index, distance) 
+        if f == False: # add new cluster
+            mean = new_instance
+            cov = np.eye(num_sensors)
+            clusters.append(cluster(new_instance, alpha, beta, _lambda, mean, cov, gamma))
+        else:
+            _,_ = clusters[f].update(new_instance)
 
+    # print results and plot informations
+    print '# of clusters is: ', len(clusters)
+
+    plt.plot(clusters[5].elements[:,0], clusters[5].elements[:,1], 'r*',
+    clusters[10].elements[:,0], clusters[10].elements[:,1], 'go',
+    clusters[20].elements[:,0], clusters[20].elements[:,1], 'b^') 
+    plt.show()
 
 #######
 ##Try to uses python classes to define each cluster, 

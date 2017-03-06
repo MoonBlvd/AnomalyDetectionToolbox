@@ -6,6 +6,7 @@ class anomalyDetector():
 
     def __init__(self, gamma):
         self.gamma = gamma
+        
 
     def classify(self, m, cov_inv, x):
         num_clusters = len(m)
