@@ -73,12 +73,23 @@ if __name__ == '__main__':
             _,_ = clusters[f].update(new_instance)
 
     # print results and plot informations
-    print '# of clusters is: ', len(clusters)
-
-    plt.plot(clusters[5].elements[:,0], clusters[5].elements[:,1], 'r*',
-    clusters[10].elements[:,0], clusters[10].elements[:,1], 'go',
-    clusters[20].elements[:,0], clusters[20].elements[:,1], 'b^') 
+    num_clusters = len(clusters)
+    print '# of clusters is: ', num_clusters
+    color = np.zeros([num_clusters, 3]) 
+    color[:,0] = np.array(range(0,num_clusters))/(num_clusters-1)#R
+    color[:,1] = np.array(range(num_clusters,0,-1))/(num_clusters-1)#G
+    color[:,2] = np.array(range(num_clusters,0,-1))/(num_clusters-1)#B
+    plt.figure(1) 
+    plt.plot(normal_data[:,0], normal_data[:,1], '*', markersize = 5)
+    plt.xlabel('speed [km/h]')
+    plt.ylabel('steering [rad]')
+    plt.figure(2)
+    for j in range (0,num_clusters):
+        plt.plot(clusters[j].elements[:,0], clusters[j].elements[:,1],'*', color = color[j])
+    plt.xlabel('speed [km/h]')
+    plt.ylabel('steering [rad]')
     plt.show()
+
 
 #######
 ##Try to uses python classes to define each cluster, 
