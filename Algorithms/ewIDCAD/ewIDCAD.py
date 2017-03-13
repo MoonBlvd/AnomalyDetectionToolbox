@@ -50,19 +50,23 @@ def read_data_fields(file_path):
 
 if __name__ == '__main__':
     # read data and fields
+    #file_path = '../../Benchmarks/Time Series Data/'
+    #data_file_name = 'simulating_data_ECG.csv'
+    #fields_file_name = 'fields.csv'
+    #normal_data = read_data(file_path + data_file_name)
+    #fields = read_data_fields(file_path + fields_file_name)
+
     file_path = '../../Benchmarks/Time Series Data/'
     data_file_name = 'simulating_data_ECG.csv'
-    fields_file_name = 'fields.csv'
     normal_data = read_data(file_path + data_file_name)
-    fields = read_data_fields(file_path + fields_file_name)
 
     # extract data features
-    num_seqs, num_sensors = normal_data.shape
-    extractor = feature_extractor(num_sensors)
-    features = extractor.find_depend_data(normal_data, fields)
-    #normal_data = normal_data[:,2:4]
-    #normal_data = np.append(normal_data, normal_data[:,[0]]**2, 1)
-    #normal_data = np.append(normal_data, normal_data[:,[1]]**2, 1)
+    #num_seqs, num_sensors = normal_data.shape
+    #extractor = feature_extractor(num_sensors)
+    #features = extractor.find_depend_data(normal_data, fields)
+    ##normal_data = normal_data[:,2:4]
+    ##normal_data = np.append(normal_data, normal_data[:,[0]]**2, 1)
+    ##normal_data = np.append(normal_data, normal_data[:,[1]]**2, 1)
 
 
     # get initial data
