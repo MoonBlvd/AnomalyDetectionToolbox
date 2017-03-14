@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 # Parameters configuration
 _lambda = 0.95 # forgetting factor
-gamma = 0.90 # probability of misclassification 
+gamma = 0.98 # probability of misclassification 
 f = False # classification label, False means not belongs to any existing clusters
 alpha = 1 # 
 beta = 1 #
@@ -50,26 +50,11 @@ def read_data_fields(file_path):
 
 if __name__ == '__main__':
     # read data and fields
-    #file_path = '../../Benchmarks/Time Series Data/'
-    #data_file_name = 'simulating_data_ECG.csv'
-    #fields_file_name = 'fields.csv'
-    #normal_data = read_data(file_path + data_file_name)
-    #fields = read_data_fields(file_path + fields_file_name)
-
     file_path = '../../Benchmarks/Time Series Data/'
     data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
     normal_data = read_data(file_path + data_file_name)
 
-    print "normal data : ", normal_data
     input("Press Enter to continue...")
-    # extract data features
-    #num_seqs, num_sensors = normal_data.shape
-    #extractor = feature_extractor(num_sensors)
-    #features = extractor.find_depend_data(normal_data, fields)
-    ##normal_data = normal_data[:,2:4]
-    ##normal_data = np.append(normal_data, normal_data[:,[0]]**2, 1)
-    ##normal_data = np.append(normal_data, normal_data[:,[1]]**2, 1)
-
 
     # get initial data
     init_samples = normal_data[start:k][:]
@@ -89,9 +74,8 @@ if __name__ == '__main__':
         f = clusters[index].classify(index, distance) 
         
         if f == False: # add new cluster
-            mean = new_instance
-            cov = np.eye(num_sensors)
-            clusters.append(cluster(new_instance, alpha, beta, _lambda, mean, cov, gamma))
+            
+            
         else:
             _,_ = clusters[f].update(new_instance)
 
