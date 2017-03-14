@@ -1,6 +1,7 @@
 from __future__ import division
 import numpy as np
 from scipy.stats import chi2
+import csv
 
 #def chi_square(elements, mean, cov):
     #den = np.ones_like(elements)
@@ -25,7 +26,8 @@ class cluster():
         self.gamma = gamma
         # initialize the chi_square of the cluster
         #self.chi_square = chi_square(self.elements, self.mean, self.cov)
-        self.chi_square = chi2.ppf(self.gamma, len(cov))
+        self.chi_square = 1/chi2.ppf((1-self.gamma), len(cov))
+
     def update(self, x):
         # here x should be 1*W array where W is the number of features
         self.elements = np.vstack([self.elements, x])
@@ -33,26 +35,61 @@ class cluster():
         self.alpha = self.alpha*self._lambda + 1
         self.beta = self.beta*self._lambda**2 + 1
         A = self.cov_inv/(self._lambda * self.tmp) # Note that this is the A_{k-1}
-        self.tmp = self.alpha/(self.alpha**2-self.beta)
+        new_tmp = self.alpha/(self.alpha**2-self.beta)
         # update mean
         self.mean = self.mean + (x - self.mean)/self.alpha
+        self.cov = new_tmp*((self._lambda/self.tmp)*self.cov + np.dot((x-self.mean).T,x-self.mean))
+        self.tmp = new_tmp
 
         # update inverse of covariance
         num = np.dot(np.dot(np.dot(A,((x - self.mean).T)),(x - self.mean)), A)
         den = 1 + np.dot(np.dot(((x - self.mean).T), A), (x - self.mean))
         self.cov_inv = (1/self.tmp) * (A - num / den )
-        #print 'A is: ', A
-        #print 'x - m is: ', x - self.mean
-        #print 'num is: ', num
-        #print 'den is: ', den
-        #print 'cov_inv is: ', self.cov_inv
+        # save the trajectory of means and covs
+        meanfile = open('new_mean.csv', 'a')
+        writer = csv.writer(meanfile, delimiter = ',')
+        writer.writerow(self.mean)
+        meanfile.close
+
+        covfile = open('new_cov.csv', 'a')
+        writer = csv.writer(covfile, delimiter = ',')
+        for i in range (0, len(self.cov)):
+            writer.writerow(self.cov[i])
+        covfile.close
+
+        cov_inv_file = open('new_cov_inv.csv', 'a')
+        writer = csv.writer(cov_inv_file, delimiter = ',')
+        for i in range (0, len(self.cov_inv)):
+            writer.writerow(self.cov_inv[i])
+        cov_inv_file.close
+
         return self.mean, self.cov_inv
     def compute_distance(self, x):
         distance = np.dot(np.dot((x - self.mean), self.cov_inv), (x - self.mean).T)
         return distance
-    def classify(self, index, distance):
-        if distance < self.chi_square:
-            f = index
-        else:
-            f = False
+
+    def classify(self, index, distance, new_instance, classify_type):
+        #print "the distance is: ", distance
+        #print "the chi_square is: ", self.chi_square
+        if classify_type == 'chi_square':
+            if distance < self.chi_square:
+                f = index
+            else:
+                f = np.inf
+        elif classify_type == '3_sigma':
+            dist = self.compute_dist_to_ellipse(new_instance) 
+            #print "the distance to the ellipse is: ", dist
+            if dist < 7.378:
+                f = index
+            else:
+               f = np.inf
         return f
+
+    def compute_dist_to_ellipse(self, new_instance):
+        #eig_vectors, eig_values = np.linalg.eig(self.cov)
+        std = np.sqrt(np.diag(self.cov))
+        dist = np.sum((new_instance/std)**2)
+        return dist
+
+
+        
