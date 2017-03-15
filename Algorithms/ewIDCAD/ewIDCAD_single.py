@@ -13,7 +13,7 @@ f = np.inf # classification label, False means not belongs to any existing clust
 alpha = 1 # 
 beta = 1 #
 start = 0 # skip the first 50 points
-k = 50 # num of initial samples
+k = 5 # num of initial samples
 classify_type = 'chi_square'
 #classify_type = '3_sigma'
 
@@ -70,6 +70,8 @@ if __name__ == '__main__':
     all_anomalies = np.zeros(num_sensors)[None,:]
     cum_anomalies = 3
     j = 0
+    tmp_index = None
+    anomalies_index = np.zeros(1)
     print "Start update from the ", k, "th instance to the ", num_seqs,"th instance" 
 
     for i in range(k, num_seqs):
@@ -81,16 +83,20 @@ if __name__ == '__main__':
         if f == np.inf: # add new cluster
             if anomalies == None:
                 anomalies = new_instance
+                tmp_index = i
             else:
                 anomalies = np.vstack([anomalies, new_instance])
+                tmp_index = np.vstack([tmp_index, i])
             _,_ = clusters[0].update(new_instance)
             j += 1
         else:
             if j > cum_anomalies:
                 print"the anomalies are: ", anomalies
                 all_anomalies = np.vstack([all_anomalies, anomalies])
+                anomalies_index = np.vstack([anomalies_index, tmp_index])
             j = 0
             anomalies = None
+            tmp_index = None
             _,_ = clusters[f].update(new_instance)
 
     # print results and plot informations
@@ -110,6 +116,15 @@ if __name__ == '__main__':
     plt.plot(all_anomalies[1:,0], all_anomalies[1:,1], 'ro')
     plt.xlabel('Temperature [degC]')
     plt.ylabel('Humidity [%]')
+    
+    plt.figure(3)
+    print "length", len(clusters[0].elements[:,0])
+    print "num_seqs", num_seqs
+    plt.plot(range(0,num_seqs),clusters[0].elements[:,0],'g*')
+    plt.plot(range(0,num_seqs),clusters[0].elements[:,1],'b*')
+    plt.plot(anomalies_index[1:], all_anomalies[1:,0],'ro')
+    plt.plot(anomalies_index[1:], all_anomalies[1:,1],'ro')
+    
     plt.show()
 
 
