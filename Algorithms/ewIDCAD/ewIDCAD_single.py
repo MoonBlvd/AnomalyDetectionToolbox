@@ -19,6 +19,7 @@ classify_type = 'chi_square'
 
 def find_min_distance(clusters, new_instance):
     min_distance = np.inf
+    min_index = 0
     for i in range (0, len(clusters)):
         distance = clusters[i].compute_distance(new_instance)    
         if distance < min_distance:
@@ -54,8 +55,8 @@ def read_data_fields(file_path):
 
 if __name__ == '__main__':
     # read data and fields
-    file_path = '../../Benchmarks/Time Series Data/'
-    data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
+    file_path = '../../Benchmarks/Time Series Data/LG/'
+    data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
     normal_data = read_data(file_path + data_file_name)
     num_seqs, num_sensors = normal_data.shape
     # get initial data
