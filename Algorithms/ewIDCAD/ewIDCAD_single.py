@@ -12,8 +12,8 @@ gamma = 0.98 # probability of misclassification
 f = np.inf # classification label, False means not belongs to any existing clusters
 alpha = 1 # 
 beta = 1 #
-start = 0 # skip the first 50 points
-k = 5 # num of initial samples
+start = 50 # skip the first 50 points
+k = 100 # num of initial samples
 classify_type = 'chi_square'
 #classify_type = '3_sigma'
 
@@ -55,8 +55,8 @@ def read_data_fields(file_path):
 
 if __name__ == '__main__':
     # read data and fields
-    file_path = '../../Benchmarks/Time Series Data/LG/'
-    data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
+    file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
+    data_file_name = 'simulating_data_ref.csv'
     normal_data = read_data(file_path + data_file_name)
     num_seqs, num_sensors = normal_data.shape
     # get initial data
