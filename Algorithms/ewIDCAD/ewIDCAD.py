@@ -2,24 +2,19 @@ import numpy as np
 import csv
 from clusters import cluster
 import matplotlib.pyplot as plt
-from matplotlib.patches import Ellipse
-
 #from featureExtractor import feature_extractor
 
 # Parameters configuration
 _lambda = 0.95 # forgetting factor
 gamma = 0.98 # probability of misclassification 
-f = np.inf # classification label, False means not belongs to any existing clusters
+f = False # classification label, False means not belongs to any existing clusters
 alpha = 1 # 
 beta = 1 #
 start = 50 # skip the first 50 points
 k = 100 # num of initial samples
-classify_type = 'chi_square'
-#classify_type = '3_sigma'
 
 def find_min_distance(clusters, new_instance):
     min_distance = np.inf
-    min_index = 0
     for i in range (0, len(clusters)):
         distance = clusters[i].compute_distance(new_instance)    
         if distance < min_distance:
@@ -55,10 +50,26 @@ def read_data_fields(file_path):
 
 if __name__ == '__main__':
     # read data and fields
-    file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
-    data_file_name = 'simulating_data_ref.csv'
+    #file_path = '../../Benchmarks/Time Series Data/'
+    #data_file_name = 'simulating_data_ECG.csv'
+    #fields_file_name = 'fields.csv'
+    #normal_data = read_data(file_path + data_file_name)
+    #fields = read_data_fields(file_path + fields_file_name)
+
+    file_path = '../../Benchmarks/Time Series Data/'
+    data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
     normal_data = read_data(file_path + data_file_name)
-    num_seqs, num_sensors = normal_data.shape
+
+    print "normal data : ", normal_data
+    # extract data features
+    #num_seqs, num_sensors = normal_data.shape
+    #extractor = feature_extractor(num_sensors)
+    #features = extractor.find_depend_data(normal_data, fields)
+    ##normal_data = normal_data[:,2:4]
+    ##normal_data = np.append(normal_data, normal_data[:,[0]]**2, 1)
+    ##normal_data = np.append(normal_data, normal_data[:,[1]]**2, 1)
+
+
     # get initial data
     init_samples = normal_data[start:k][:]
     mean = init_samples.mean(axis = 0)
@@ -67,12 +78,6 @@ if __name__ == '__main__':
     # initialize the online updator 
     clusters = []
     clusters.append(cluster(init_samples, alpha, beta, _lambda, mean, cov, gamma))
-    anomalies = None
-    all_anomalies = np.zeros(num_sensors)[None,:]
-    cum_anomalies = 3
-    j = 0
-    tmp_index = None
-    anomalies_index = np.zeros(1)
     print "Start update from the ", k, "th instance to the ", num_seqs,"th instance" 
 
     for i in range(k, num_seqs):
@@ -80,59 +85,29 @@ if __name__ == '__main__':
         new_instance = normal_data[i][:]
         # classify the new instance, f is the cluster label
         distance, index = find_min_distance(clusters, new_instance)
-        f = clusters[index].classify(index, distance, new_instance, classify_type) 
-        if f == np.inf: # add anomalies
-            if anomalies == None:
-                anomalies = new_instance
-                tmp_index = i
-            else:
-                anomalies = np.vstack([anomalies, new_instance])
-                tmp_index = np.vstack([tmp_index, i])
-            _,_ = clusters[0].update(new_instance)
-            j += 1
+        f = clusters[index].classify(index, distance) 
+        
+        if f == np.inf: # add new cluster
+            mean = new_instance
+            cov = np.eye(num_sensors)
+            clusters.append(cluster(new_instance, alpha, beta, _lambda, mean, cov, gamma))
         else:
-            if j > cum_anomalies:
-                print"the anomalies are: ", anomalies
-                all_anomalies = np.vstack([all_anomalies, anomalies])
-                anomalies_index = np.vstack([anomalies_index, tmp_index])
-            j = 0
-            anomalies = None
-            tmp_index = None
             _,_ = clusters[f].update(new_instance)
 
     # print results and plot informations
     num_clusters = len(clusters)
-    num_anomalies = all_anomalies.shape[0]-1
-    if num_anomalies == 0 and anomalies != None:
-        all_anomalies = np.vstack([all_anomalies, anomalies])
-        anomalies_index = np.vstack([anomalies_index, tmp_index])
     print '# of clusters is: ', num_clusters
-    print '# of anomalies is: ', all_anomalies.shape[0]-1
+    color = np.zeros([num_clusters, 3]) 
+    color[:,0] = np.array(range(0,num_clusters))/(num_clusters-1)#R
+    color[:,1] = np.array(range(num_clusters,0,-1))/(num_clusters-1)#G
+    color[:,2] = np.array(range(num_clusters,0,-1))/(num_clusters-1)#B
     plt.figure(1) 
-    plt.plot(normal_data[:,0], normal_data[:,1], 'g*', markersize = 5)
-    plt.xlabel('Temperature [degC]')
-    plt.ylabel('Humidity [%]')
+    plt.plot(normal_data[:,0], normal_data[:,1], '*', markersize = 5)
+    plt.xlabel('speed [km/h]')
+    plt.ylabel('steering [rad]')
     plt.figure(2)
     for j in range (0,num_clusters):
-        plt.plot(clusters[j].elements[:,0], clusters[j].elements[:,1],'g*')
-    plt.plot(all_anomalies[1:,0], all_anomalies[1:,1], 'ro')
-    plt.xlabel('Temperature [degC]')
-    plt.ylabel('Humidity [%]')
-    
-    plt.figure(3)
-    print "length", len(clusters[0].elements[:,0])
-    print "num_seqs", num_seqs-start
-    plt.plot(range(0,num_seqs-start),clusters[0].elements[:,0],'g*')
-    plt.plot(range(0,num_seqs-start),clusters[0].elements[:,1],'b*')
-    
-    print "anomalies_index is: ", anomalies_index.shape
-    plt.plot(anomalies_index[1:], all_anomalies[1:,0],'ro')
-    plt.plot(anomalies_index[1:], all_anomalies[1:,1],'ro')
-    
-    plt.show()
-
-
-#######
-##Try to uses python classes to define each cluster, 
-#then use for loop in the main function
-
+        plt.plot(clusters[j].elements[:,0], clusters[j].elements[:,1],'*', color = color[j])
+    plt.xlabel('speed [km/h]')
+    plt.ylabel('steering [rad]')
+plt.show()
