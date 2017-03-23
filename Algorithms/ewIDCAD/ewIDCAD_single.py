@@ -10,10 +10,10 @@ from matplotlib.patches import Ellipse
 _lambda = 0.95 # forgetting factor
 gamma = 0.98 # probability of misclassification 
 f = np.inf # classification label, False means not belongs to any existing clusters
-alpha = 1 # 
+alpha = 1 # initialize alpha and beta
 beta = 1 #
 start = 50 # skip the first 50 points
-k = 100 # num of initial samples
+k = 100 # k-stary is the num of initial samples
 classify_type = 'chi_square'
 #classify_type = '3_sigma'
 
@@ -55,11 +55,11 @@ def read_data_fields(file_path):
 
 if __name__ == '__main__':
     # read data and fields
-    file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
-    data_file_name = 'simulating_data_ref.csv'
+    file_path = '../../Benchmarks/Time Series Data/IBRL/'
+    data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
     normal_data = read_data(file_path + data_file_name)
     num_seqs, num_sensors = normal_data.shape
-    # get initial data
+    # get initial samples
     init_samples = normal_data[start:k][:]
     mean = init_samples.mean(axis = 0)
     cov = np.cov(init_samples.T)
@@ -81,7 +81,7 @@ if __name__ == '__main__':
         # classify the new instance, f is the cluster label
         distance, index = find_min_distance(clusters, new_instance)
         f = clusters[index].classify(index, distance, new_instance, classify_type) 
-        if f == np.inf: # add anomalies
+        if f == np.inf: # add new anomaly to a temperal anomaly list.
             if anomalies == None:
                 anomalies = new_instance
                 tmp_index = i
@@ -90,8 +90,8 @@ if __name__ == '__main__':
                 tmp_index = np.vstack([tmp_index, i])
             _,_ = clusters[0].update(new_instance)
             j += 1
-        else:
-            if j > cum_anomalies:
+        else: # no new anomalies detected, reset the temperal anomaly list.
+            if j > cum_anomalies: # if there are consecutive anomalies
                 print"the anomalies are: ", anomalies
                 all_anomalies = np.vstack([all_anomalies, anomalies])
                 anomalies_index = np.vstack([anomalies_index, tmp_index])
@@ -130,9 +130,3 @@ if __name__ == '__main__':
     plt.plot(anomalies_index[1:], all_anomalies[1:,1],'ro')
     
     plt.show()
-
-
-#######
-##Try to uses python classes to define each cluster, 
-#then use for loop in the main function
-
