@@ -1,8 +1,8 @@
 import numpy as np
 import csv
 from clusters import cluster
-import matplotlib.pyplot as plt
-from matplotlib.patches import Ellipse
+from plot_results import plot_results
+import sys
 
 #from featureExtractor import feature_extractor
 
@@ -10,10 +10,11 @@ from matplotlib.patches import Ellipse
 _lambda = 0.95 # forgetting factor
 gamma = 0.98 # probability of misclassification 
 f = np.inf # classification label, False means not belongs to any existing clusters
-alpha = 1 # initialize alpha and beta
-beta = 1 #
-start = 50 # skip the first 50 points
-k = 100 # k-stary is the num of initial samples
+alpha = 2 # initialize alpha and beta
+beta = 2 #
+start = 1 # skip the first 50 points
+k = 3 # k-stary is the num of initial samples
+stablization = 10
 classify_type = 'chi_square'
 #classify_type = '3_sigma'
 
@@ -55,8 +56,10 @@ def read_data_fields(file_path):
 
 if __name__ == '__main__':
     # read data and fields
-    file_path = '../../Benchmarks/Time Series Data/IBRL/'
-    data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
+    #file_path = '../../Benchmarks/Time Series Data/IBRL/'
+    #data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
+    file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
+    data_file_name = 'simulating_data_ref.csv'
     normal_data = read_data(file_path + data_file_name)
     num_seqs, num_sensors = normal_data.shape
     # get initial samples
@@ -68,11 +71,10 @@ if __name__ == '__main__':
     clusters = []
     clusters.append(cluster(init_samples, alpha, beta, _lambda, mean, cov, gamma))
     anomalies = None
-    all_anomalies = np.zeros(num_sensors)[None,:]
-    cum_anomalies = 3
+    cum_anomalies = 4
     j = 0
     tmp_index = None
-    anomalies_index = np.zeros(1)
+    big_anomalies_index = np.zeros(1)
     print "Start update from the ", k, "th instance to the ", num_seqs,"th instance" 
 
     for i in range(k, num_seqs):
@@ -82,51 +84,35 @@ if __name__ == '__main__':
         distance, index = find_min_distance(clusters, new_instance)
         f = clusters[index].classify(index, distance, new_instance, classify_type) 
         if f == np.inf: # add new anomaly to a temperal anomaly list.
-            if anomalies == None:
-                anomalies = new_instance
-                tmp_index = i
-            else:
-                anomalies = np.vstack([anomalies, new_instance])
-                tmp_index = np.vstack([tmp_index, i])
-            _,_ = clusters[0].update(new_instance)
-            j += 1
+            if i > stablization:
+                if anomalies == None:
+                    anomalies = new_instance
+                    tmp_index = i
+                else:
+                    anomalies = np.vstack([anomalies, new_instance])
+                    tmp_index = np.vstack([tmp_index, i])
+                j += 1
         else: # no new anomalies detected, reset the temperal anomaly list.
             if j > cum_anomalies: # if there are consecutive anomalies
                 print"the anomalies are: ", anomalies
-                all_anomalies = np.vstack([all_anomalies, anomalies])
-                anomalies_index = np.vstack([anomalies_index, tmp_index])
+                big_anomalies_index = np.vstack([big_anomalies_index, tmp_index])
             j = 0
-            anomalies = None
             tmp_index = None
-            _,_ = clusters[f].update(new_instance)
+        _,_ = clusters[index].update(new_instance)
 
     # print results and plot informations
     num_clusters = len(clusters)
-    num_anomalies = all_anomalies.shape[0]-1
+    num_anomalies = anomalies.shape[0]-1
+    num_big_anomalies = len(big_anomalies_index)
+    big_anomalies_index = np.ndarray.tolist(big_anomalies_index)
     if num_anomalies == 0 and anomalies != None:
-        all_anomalies = np.vstack([all_anomalies, anomalies])
-        anomalies_index = np.vstack([anomalies_index, tmp_index])
+        print 'No anomalies are detected!'
+        sys.exit()
     print '# of clusters is: ', num_clusters
-    print '# of anomalies is: ', all_anomalies.shape[0]-1
-    plt.figure(1) 
-    plt.plot(normal_data[:,0], normal_data[:,1], 'g*', markersize = 5)
-    plt.xlabel('Temperature [degC]')
-    plt.ylabel('Humidity [%]')
-    plt.figure(2)
-    for j in range (0,num_clusters):
-        plt.plot(clusters[j].elements[:,0], clusters[j].elements[:,1],'g*')
-    plt.plot(all_anomalies[1:,0], all_anomalies[1:,1], 'ro')
-    plt.xlabel('Temperature [degC]')
-    plt.ylabel('Humidity [%]')
+    print '# of anomalies is: ', num_anomalies
+    print '# of big anomalies is: ', num_big_anomalies
+    print big_anomalies_index
     
-    plt.figure(3)
-    print "length", len(clusters[0].elements[:,0])
-    print "num_seqs", num_seqs-start
-    plt.plot(range(0,num_seqs-start),clusters[0].elements[:,0],'g*')
-    plt.plot(range(0,num_seqs-start),clusters[0].elements[:,1],'b*')
-    
-    print "anomalies_index is: ", anomalies_index.shape
-    plt.plot(anomalies_index[1:], all_anomalies[1:,0],'ro')
-    plt.plot(anomalies_index[1:], all_anomalies[1:,1],'ro')
-    
-    plt.show()
+    # plot results
+    plotter = plot_results(normal_data, clusters, big_anomalies_index, num_seqs, start)
+    plotter.plot()

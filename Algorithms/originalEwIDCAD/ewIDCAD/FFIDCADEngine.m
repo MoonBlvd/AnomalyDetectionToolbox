@@ -1,8 +1,11 @@
+clear;clc;
+load data
+IBRL18=csvread('../../../Benchmarks/Time Series Data/IBRL/IBRL_18_25000-28800_temp_hum.csv');
 D=2;
 Ts=0.98;
 Threshold1 = chi2inv(Ts,D);
 Isplot=1;
-Reduced = LGS18;%
+Reduced = IBRL18;%LG12;%
 n=size(Reduced,1);
 firstinitdepth=D+1;
 stabilization=10;
@@ -16,7 +19,7 @@ wSum=D;
 wPowerSum=D;
 Anomalies1=[];
 InaRow1=0;
-CA=4; % Threshold for consequent anomalies to consider anomaly significant
+CA=5; % Threshold for consequent anomalies to consider anomaly significant
 
 for i=firstinitdepth+1:1:n
      mahaldist=(Reduced(i,1:D)-TrackerC)*TrackerA*(Reduced(i,1:D)-TrackerC)';

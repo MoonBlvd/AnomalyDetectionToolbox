@@ -22,19 +22,21 @@ class cluster():
         self._lambda = _lambda
         self.mean = mean
         self.cov = cov
-        self.cov_inv = np.linalg.inv(self.cov)
+        self.cov_inv = np.eye(len(self.cov)) # Initialize as identical matrix
         self.gamma = gamma
         # initialize the chi_square of the cluster
-        #self.chi_square = chi_square(self.elements, self.mean, self.cov)
-        self.chi_square = 1/chi2.ppf((1-self.gamma), len(cov))
+        #self.chi_square = 1/chi2.ppf((1-self.gamma), len(cov))
+        self.chi_square = chi2.ppf(self.gamma, len(self.cov))
+        print "self.chi_square is: ", self.chi_square
 
     def update(self, x):
         # here x should be 1*W array where W is the number of features
         self.elements = np.vstack([self.elements, x])
         # update parameters
+        A = self.cov_inv/(self._lambda / self.tmp) # Note that this is the A_{k-1}
         self.alpha = self.alpha*self._lambda + 1
         self.beta = self.beta*self._lambda**2 + 1
-        A = self.cov_inv/(self._lambda * self.tmp) # Note that this is the A_{k-1}
+
         new_tmp = self.alpha/(self.alpha**2-self.beta)
         # update mean
         self.mean = self.mean + (x - self.mean)/self.alpha
@@ -42,9 +44,10 @@ class cluster():
         self.tmp = new_tmp
 
         # update inverse of covariance
-        num = np.dot(np.dot(np.dot(A,((x - self.mean).T)),(x - self.mean)), A)
-        den = 1 + np.dot(np.dot(((x - self.mean).T), A), (x - self.mean))
+        num = np.dot(np.dot(np.dot(A,(x - self.mean).T),(x - self.mean)), A)
+        den = 1 + np.dot(np.dot((x - self.mean).T, A), (x - self.mean))
         self.cov_inv = (1/self.tmp) * (A - num / den )
+        '''
         # save the trajectory of means and covs
         meanfile = open('new_mean.csv', 'a')
         writer = csv.writer(meanfile, delimiter = ',')
@@ -62,7 +65,7 @@ class cluster():
         for i in range (0, len(self.cov_inv)):
             writer.writerow(self.cov_inv[i])
         cov_inv_file.close
-
+        '''
         return self.mean, self.cov_inv
     def compute_distance(self, x):
         distance = np.dot(np.dot((x - self.mean), self.cov_inv), (x - self.mean).T)
