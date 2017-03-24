@@ -6,6 +6,11 @@ Ts=0.98;
 Threshold1 = chi2inv(Ts,D);
 Isplot=1;
 Reduced = IBRL18;%LG12;%
+
+Reduced1 = [[0:0.1:30]', rand(301,1)];
+Reduced2 = [31*ones(1000,1), rand(1000,1)];%+rand(1000,1)/2-1
+Reduced = [Reduced1;Reduced2];
+plot(Reduced(:,1), Reduced(:,2),'*');
 n=size(Reduced,1);
 firstinitdepth=D+1;
 stabilization=10;
