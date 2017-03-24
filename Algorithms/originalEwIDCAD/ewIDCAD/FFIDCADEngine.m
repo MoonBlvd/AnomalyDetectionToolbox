@@ -45,3 +45,9 @@ for i=firstinitdepth+1:1:n
          end
     end
 end
+
+plot([1:3094], IBRL18(:,1),'g*');hold on;
+plot([1:3094], IBRL18(:,2),'g*');hold on;
+plot(find(AnomalyIndex3==1), IBRL18(find(AnomalyIndex3==1),1),'ro'); hold on;
+plot(find(AnomalyIndex3==1), IBRL18(find(AnomalyIndex3==1),2),'ro'); hold on;
+
