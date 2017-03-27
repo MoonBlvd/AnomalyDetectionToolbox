@@ -50,3 +50,9 @@ for i=firstinitdepth+1:1:n
          end
     end
 end
+
+plot([1:size(Reduced,1)], Reduced(:,1),'g*');hold on;
+plot([1:size(Reduced,1)], Reduced(:,2),'g*');hold on;
+plot(find(AnomalyIndex3==1), Reduced(find(AnomalyIndex3==1),1),'ro'); hold on;
+plot(find(AnomalyIndex3==1), Reduced(find(AnomalyIndex3==1),2),'ro'); hold on;
+

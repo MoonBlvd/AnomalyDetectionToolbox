@@ -12,7 +12,7 @@ gamma = 0.98 # probability of misclassification
 f = np.inf # classification label, False means not belongs to any existing clusters
 alpha = 2 # initialize alpha and beta
 beta = 2 #
-start = 1 # skip the first 50 points
+start = 0 # skip the first 50 points
 k = 3 # k-stary is the num of initial samples
 stablization = 10
 classify_type = 'chi_square'
@@ -44,7 +44,7 @@ def read_data(file_path):
             i += 1
     return data
 
-def read_data_fields(file_path):
+def read_fields(file_path):
     with open(file_path, 'r') as file:
         reader = csv.reader(file, delimiter = ',')
         for line in reader:
@@ -56,12 +56,22 @@ def read_data_fields(file_path):
 
 if __name__ == '__main__':
     # read data and fields
-    #file_path = '../../Benchmarks/Time Series Data/IBRL/'
+    file_path = '../../Benchmarks/Time Series Data/LG/'
     #data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
-    file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
-    data_file_name = 'simulating_data_ref.csv'
+    #fields_file_name = 'IBRL_fields.csv'
+    #data_file_name = 'GSB_12_Oct_temp_humi_mean.csv'
+    #fields_file_name = 'GSB_fields.csv'
+    data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
+    fields_file_name = 'LG_fields.csv'
+
+    #file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
+    #data_file_name = 'Car_RollOverData_1_6D.csv'
+    #fields_file_name = 'rollover_fields.csv'
+
     normal_data = read_data(file_path + data_file_name)
+    fields = read_fields(file_path + fields_file_name)
     num_seqs, num_sensors = normal_data.shape
+
     # get initial samples
     init_samples = normal_data[start:k][:]
     mean = init_samples.mean(axis = 0)
@@ -74,6 +84,7 @@ if __name__ == '__main__':
     cum_anomalies = 4
     j = 0
     tmp_index = None
+    anomalies_index = 0
     big_anomalies_index = np.zeros(1)
     print "Start update from the ", k, "th instance to the ", num_seqs,"th instance" 
 
@@ -85,12 +96,14 @@ if __name__ == '__main__':
         f = clusters[index].classify(index, distance, new_instance, classify_type) 
         if f == np.inf: # add new anomaly to a temperal anomaly list.
             if i > stablization:
-                if anomalies == None:
-                    anomalies = new_instance
+                if tmp_index == None:
+                #if anomalies == None:
+                    #anomalies = new_instance
                     tmp_index = i
                 else:
-                    anomalies = np.vstack([anomalies, new_instance])
+                    #anomalies = np.vstack([anomalies, new_instance])
                     tmp_index = np.vstack([tmp_index, i])
+                anomalies_index = np.vstack([anomalies_index, i])
                 j += 1
         else: # no new anomalies detected, reset the temperal anomaly list.
             if j > cum_anomalies: # if there are consecutive anomalies
@@ -102,8 +115,8 @@ if __name__ == '__main__':
 
     # print results and plot informations
     num_clusters = len(clusters)
-    num_anomalies = anomalies.shape[0]-1
-    num_big_anomalies = len(big_anomalies_index)
+    num_anomalies = len(anomalies_index)-1
+    num_big_anomalies = len(big_anomalies_index)-1
     big_anomalies_index = np.ndarray.tolist(big_anomalies_index)
     if num_anomalies == 0 and anomalies != None:
         print 'No anomalies are detected!'
@@ -114,5 +127,8 @@ if __name__ == '__main__':
     print big_anomalies_index
     
     # plot results
-    plotter = plot_results(normal_data, clusters, big_anomalies_index, num_seqs, start)
-    plotter.plot()
+    plotter = plot_results(normal_data, fields, clusters, anomalies_index, 
+            big_anomalies_index, num_seqs, start)
+    x_label = 0
+    y_label = 1
+    plotter.plot(x_label, y_label)
