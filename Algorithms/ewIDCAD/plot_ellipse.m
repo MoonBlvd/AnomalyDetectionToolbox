@@ -30,17 +30,13 @@ for i = 1: size(mean,1)
     angle = [0:500]*2*pi/np;
     R = [cos(theta),-sin(theta);sin(theta), cos(theta)];
     pts = [mu(1);mu(2)]*ones(size(angle)) + R*[cos(angle)*a; sin(angle)*b];
-    if i == 1
-        plot(raw_data(1:5,1), raw_data(1:5,2), '*');
-        hold on;
-    else
-        plot(raw_data(i,1), raw_data(i,2),'*');
-        hold on
-    end
-    
+    plot(raw_data(1:i,1), raw_data(1:i,2),'*');
+    hold on
+        
     plot(pts(1,:), pts(2,:), 'r');
-    xlim([20,70]);
-    ylim([20,45]);
+    xlabel('lateral pos');ylabel('lateral vel');
+    xlim([-5,10]);
+    ylim([-5,10]);
     pause(0.05)
     hold off
 end
