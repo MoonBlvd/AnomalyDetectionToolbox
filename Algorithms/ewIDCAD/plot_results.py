@@ -43,17 +43,17 @@ class plot_results():
         plt.title('Original data with big anomalies')
         plt.xlabel('Time step')
         plt.ylabel('Data Magnitude')
-        plt.legend(handles = plots)
+        #plt.legend(handles = plots)
         
         # plot original data with all anomalies
         plt.figure(4)
         plots = [None]*self.num_sensors
         for i in range (0, len(self.fields)):
             plots[i], = plt.plot(range(0,self.num_seqs-self.start),self.normal_data[:,i],'*',color = color[i], label = self.fields[i])
-            #plt.plot(self.anomalies_index[1:], self.normal_data[self.anomalies_index[1:],i],'ro')
+            plt.plot(self.anomalies_index[1:], self.normal_data[self.anomalies_index[1:],i],'ro')
         plt.title('Original data with all anomalies')
         plt.xlabel('Time step')
         plt.ylabel('Data Magnitude')
-        plt.legend(handles = plots)
+        #plt.legend(handles = plots)
 
         plt.show()

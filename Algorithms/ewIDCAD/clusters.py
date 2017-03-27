@@ -24,6 +24,10 @@ class cluster():
         self.cov = cov
         self.cov_inv = np.eye(len(self.cov)) # Initialize as identical matrix
         self.gamma = gamma
+ 
+        # parameters for model reset
+        self.sigma = 0.999
+        self.overlap_flag = 0
         # initialize the chi_square of the cluster
         #self.chi_square = 1/chi2.ppf((1-self.gamma), len(cov))
         self.chi_square = chi2.ppf(self.gamma, len(self.cov))
@@ -47,7 +51,10 @@ class cluster():
         num = np.dot(np.dot(np.dot(A,(x - self.mean).T),(x - self.mean)), A)
         den = 1 + np.dot(np.dot((x - self.mean).T, A), (x - self.mean))
         self.cov_inv = (1/self.tmp) * (A - num / den )
-        '''
+
+        self.cov_inv = (self.sigma**self.overlap_flag) * self.cov_inv + \
+                       (1-self.sigma**self.overlap_flag) * np.eye(len(self.cov_inv)) 
+        
         # save the trajectory of means and covs
         meanfile = open('new_mean.csv', 'a')
         writer = csv.writer(meanfile, delimiter = ',')
@@ -65,7 +72,7 @@ class cluster():
         for i in range (0, len(self.cov_inv)):
             writer.writerow(self.cov_inv[i])
         cov_inv_file.close
-        '''
+        
         return self.mean, self.cov_inv
     def compute_distance(self, x):
         distance = np.dot(np.dot((x - self.mean), self.cov_inv), (x - self.mean).T)
@@ -76,6 +83,10 @@ class cluster():
         #print "the chi_square is: ", self.chi_square
         if classify_type == 'chi_square':
             if distance < self.chi_square:
+                if distance < 0.05 * self.chi_square: # find out the too close data instance
+                    self.overlap_flag += 1
+                else:
+                    self.overlap_flag = 0
                 f = index
             else:
                 f = np.inf

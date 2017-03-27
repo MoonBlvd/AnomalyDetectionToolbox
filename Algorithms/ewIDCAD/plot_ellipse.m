@@ -11,7 +11,7 @@ data_d = size(mean,2);
 for i = 1: size(mean,1)
     mu = mean(i,1:d)';
     cov = covariance(data_d*(i-1)+1:data_d*(i-1)+d,1:d);
-    cov_inv = covariance_inv(data_d*(i-1)+1:data_d*(i-1)+d,1:d)/7.4;
+    cov_inv = covariance_inv(data_d*(i-1)+1:data_d*(i-1)+d,1:d);
     [V,D] = eig(cov_inv);
     lam1 = D(1,1);
     lam2 = D(2,2);
@@ -31,13 +31,14 @@ for i = 1: size(mean,1)
     R = [cos(theta),-sin(theta);sin(theta), cos(theta)];
     pts = [mu(1);mu(2)]*ones(size(angle)) + R*[cos(angle)*a; sin(angle)*b];
     
-    if(mod(i,100)==0)
+    if(mod(i,50)==0)
         plot(raw_data(1:i,1), raw_data(1:i,2),'*');
         hold on
     
-        plot(pts(1,:), pts(2,:), 'r');
-    %xlim([-5,10]);
-    %ylim([-5,10]);
+        %plot(pts(1,:), pts(2,:), 'r');
+        ellipse(cov_inv, mu, [1, 0.2, 0.2])
+        %xlim([-5,10]);
+        %ylim([-5,10]);
         xlim([20,70]);
         ylim([20,45]);
     
