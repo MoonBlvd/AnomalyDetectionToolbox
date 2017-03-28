@@ -47,7 +47,7 @@ class cluster():
         num = np.dot(np.dot(np.dot(A,(x - self.mean).T),(x - self.mean)), A)
         den = 1 + np.dot(np.dot((x - self.mean).T, A), (x - self.mean))
         self.cov_inv = (1/self.tmp) * (A - num / den )
-        '''
+        
         # save the trajectory of means and covs
         meanfile = open('new_mean.csv', 'a')
         writer = csv.writer(meanfile, delimiter = ',')
@@ -65,7 +65,7 @@ class cluster():
         for i in range (0, len(self.cov_inv)):
             writer.writerow(self.cov_inv[i])
         cov_inv_file.close
-        '''
+        
         return self.mean, self.cov_inv
     def compute_distance(self, x):
         distance = np.dot(np.dot((x - self.mean), self.cov_inv), (x - self.mean).T)
