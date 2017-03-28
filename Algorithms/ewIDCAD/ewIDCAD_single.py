@@ -56,17 +56,17 @@ def read_fields(file_path):
 
 if __name__ == '__main__':
     # read data and fields
-    file_path = '../../Benchmarks/Time Series Data/IBRL/'
-    data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
-    fields_file_name = 'IBRL_fields.csv'
+    #file_path = '../../Benchmarks/Time Series Data/IBRL/'
+    #data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
+    #fields_file_name = 'IBRL_fields.csv'
     #data_file_name = 'GSB_12_Oct_temp_humi_mean.csv'
     #fields_file_name = 'GSB_fields.csv'
     #data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
     #fields_file_name = 'LG_fields.csv'
 
-    #file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
-    #data_file_name = 'Car_RollOverData_1_6D.csv'
-    #fields_file_name = 'rollover_fields.csv'
+    file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
+    data_file_name = 'Car_RollOverData_1_6D.csv'
+    fields_file_name = 'rollover_fields.csv'
 
     normal_data = read_data(file_path + data_file_name)
     fields = read_fields(file_path + fields_file_name)
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     clusters = []
     clusters.append(cluster(init_samples, alpha, beta, _lambda, mean, cov, gamma))
     anomalies = None
-    cum_anomalies = 4
+    cum_anomalies = 2
     j = 0
     tmp_index = None
     anomalies_index = np.array([0])
