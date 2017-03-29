@@ -4,6 +4,7 @@ from clusters import cluster
 from plot_results import plot_results
 import sys
 from scipy.stats import chi2
+import time
 #from featureExtractor import feature_extractor
 
 # Parameters configuration
@@ -57,10 +58,10 @@ def read_fields(file_path):
 def two_separated(curr_cluster, clusters):
     separatable = True
     for single_cluster in clusters:
-        norm_1 = np.linalg.norm((curr_cluster.mean-single_cluster.mean), order = 1)
+        norm_1 = np.linalg.norm((curr_cluster.mean-single_cluster.mean), 1)
         p = len(curr_cluster.mean)
-        max_eigval_1 = max(np.linalg.eigvals(np.pinv(curr_cluster.cov_inv)))
-        max_eigval_2 = max(np.linalg.eigvals(np.pinv(single_cluster.cov_inv)))
+        max_eigval_1 = max(np.linalg.eigvals(np.linalg.pinv(curr_cluster.cov_inv)))
+        max_eigval_2 = max(np.linalg.eigvals(np.linalg.pinv(single_cluster.cov_inv)))
         if norm_1 < 2*np.sqrt(p*max(max_eigval_1, max_eigval_2)):
             separatable = False
     return separatable
@@ -68,17 +69,17 @@ def two_separated(curr_cluster, clusters):
 
 if __name__ == '__main__':
     # read data and fields
-    file_path = '../../Benchmarks/Time Series Data/IBRL/'
-    data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
-    fields_file_name = 'IBRL_fields.csv'
+    #file_path = '../../Benchmarks/Time Series Data/IBRL/'
+    #data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
+    #fields_file_name = 'IBRL_fields.csv'
     #data_file_name = 'GSB_12_Oct_temp_humi_mean.csv'
     #fields_file_name = 'GSB_fields.csv'
     #data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
     #fields_file_name = 'LG_fields.csv'
 
-    #file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
-    #data_file_name = 'Car_RollOverData_1_6D.csv'
-    #fields_file_name = 'rollover_fields.csv'
+    file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
+    data_file_name = 'Car_RollOverData_1_6D.csv'
+    fields_file_name = 'rollover_fields.csv'
 
     normal_data = read_data(file_path + data_file_name)
     fields = read_fields(file_path + fields_file_name)
@@ -105,36 +106,64 @@ if __name__ == '__main__':
     
     gamma1 = 0.99
     gamma2 = 0.999
-    anomaly = True
-    update_clusters = []
+    chi_1 = chi2.ppf(gamma1, num_sensors)
+    chi_2 = chi2.ppf(gamma2, num_sensors)
+
+
+    anomalies_index = []
+    big_anomalies_index = []
     #omega = []
     B = None
     for i in range(start, num_seqs):
+        anomaly = True
+        update_clusters = []
         print 'Iteration ', i-start
         new_instance = normal_data[i][:]
         for single_cluster in clusters:
             t = single_cluster.compute_distance(new_instance)
-            if t < chi2.ppf(gamma1, num_sensors):
+            if t < chi_1:
+                print "the data belongs to one cluster"
                 anomaly = False
-            if t > chi2.ppf(gamma2, num_sensors):
+            if t > chi_2:
+                print "the data is far from one cluster"
                 continue
-            clusters.remove(single_cluster)
+            #clusters.remove(single_cluster)
             update_clusters.append(single_cluster)
+       
+        if i-start ==49 or i-start == 50:
+            print "the mean of the cluster is: "
+            print clusters[0].mean
+            print "the cov_inv of the cluster is: "
+            print clusters[0].cov_inv
+        print "the new instance is: ", new_instance
+        print "the distance from the cluster is", t
+        print "The number of clusters to be updated", update_clusters
+        for single_cluster in update_clusters:
+            clusters.remove(single_cluster)
             #omega.append(np.exp(-t/2))
         if anomaly:
+            print "the new instance is anomaly"
             if B == None:
                 B = new_instance
             else:
                 B = np.vstack([B, new_instance])
+            anomalies_index.append(i)
         else:
+            print "the new instance is normal"
             B = None
         #omega = omega/sum(omega)
-        for i in range(len(update_clusters)):
-            update_clusters[i].update(new_instance)
+
+        for j in range(len(update_clusters)):
+            update_clusters[j].update(new_instance)
         curr_cluster.update(new_instance)
-        clusters.extend(update_clusters) # cannot use append here!
+        if j >= 0:
+            clusters.extend(update_clusters) # cannot use append here!
         if B != None and len(B) > num_sensors+1:
+            print 'Iteration ', i-start
+            print "number of consequent anomalies: ", len(B)
+            big_anomalies_index.append(i)
             if two_separated(curr_cluster, clusters):
+                print "It's two separated!"
                 mean = np.mean(B, 0)
                 cov_inv = np.linalg.pinv(np.cov(B.T))
                 clusters.append(cluster(B, alpha, beta, _lambda, mean, cov_inv, gamma, tmp, init_type))
@@ -200,6 +229,21 @@ if __name__ == '__main__':
             tmp_index = None
         mean, cov_inv, alpha, beta, tmp = clusters[index].update(new_instance)
         '''
+# -------------------------------------------------------------------------
+    num_clusters = len(clusters)
+    num_anomalies = len(anomalies_index)
+    num_big_anomalies = len(big_anomalies_index)
+    print '# of clusters is: ', num_clusters
+    print '# of anomalies is: ', num_anomalies
+    print '# of big anomalies is: ', num_big_anomalies
+    print 'big anomalous clusters are: ', big_anomalies_index
+    print 'all anomalous clusters are: ', anomalies_index
+    # plot results
+    plotter = plot_results(normal_data, fields, clusters, anomalies_index, 
+            big_anomalies_index, num_seqs, start)
+    x_label = 0
+    y_label = 1
+    plotter.plot(x_label, y_label)
     '''
     # print results and plot informations
     j = 0

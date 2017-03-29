@@ -24,9 +24,9 @@ class plot_results():
         plt.figure(2)
         num_clusters = len(self.clusters)
         plt.plot(self.normal_data[:,x], self.normal_data[:,y], 'g*', markersize = 5)
-        for j in self.anomalies_index:
-            plt.plot(self.clusters[j].elements[:,x], self.clusters[j].elements[:,y],'ro')
-        #plt.plot(self.normal_data[self.big_anomalies_index,x], self.normal_data[self.big_anomalies_index,y], 'ro')
+        #for j in self.anomalies_index:
+        #    plt.plot(self.clusters[j].elements[:,x], self.clusters[j].elements[:,y],'ro')
+        plt.plot(self.normal_data[self.big_anomalies_index,x], self.normal_data[self.big_anomalies_index,y], 'ro')
         plt.title('Original data with big anomalies')
         plt.xlabel(self.fields[x])
         plt.ylabel(self.fields[y])

@@ -52,7 +52,7 @@ class cluster():
 
         self.cov_inv = (self.sigma**self.overlap_flag) * self.cov_inv + \
                        (1-self.sigma**self.overlap_flag) * np.eye(len(self.cov_inv)) 
-        
+        '''
         # save the trajectory of means and covs
         meanfile = open('new_mean.csv', 'a')
         writer = csv.writer(meanfile, delimiter = ',')
@@ -64,7 +64,7 @@ class cluster():
         for i in range (0, len(self.cov_inv)):
             writer.writerow(self.cov_inv[i])
         cov_inv_file.close
-        
+        '''
     def augment_element(self, x):
         self.elements = np.vstack([self.elements, x])
 

@@ -26,7 +26,7 @@ class cluster():
         self.gamma = gamma
  
         # parameters for model reset
-        self.sigma = 0.999
+        self.sigma = 1
         self.overlap_flag = 0
         # initialize the chi_square of the cluster
         #self.chi_square = 1/chi2.ppf((1-self.gamma), len(cov))
