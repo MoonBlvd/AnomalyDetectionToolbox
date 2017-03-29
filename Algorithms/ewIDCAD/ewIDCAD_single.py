@@ -56,17 +56,21 @@ def read_fields(file_path):
 
 if __name__ == '__main__':
     # read data and fields
-    file_path = '../../Benchmarks/Time Series Data/IBRL/'
-    data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
-    fields_file_name = 'IBRL_fields.csv'
+    #file_path = '../../Benchmarks/Time Series Data/IBRL/'
+    #data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
+    #fields_file_name = 'IBRL_fields.csv'
     #data_file_name = 'GSB_12_Oct_temp_humi_mean.csv'
     #fields_file_name = 'GSB_fields.csv'
     #data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
     #fields_file_name = 'LG_fields.csv'
 
-    #file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
-    #data_file_name = 'Car_RollOverData_1_6D.csv'
-    #fields_file_name = 'rollover_fields.csv'
+    file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
+    data_file_name = 'Car_RollOverData_1_6D.csv'
+    fields_file_name = 'rollover_fields.csv'
+
+    #file_path = '../../Nan_Traffic_Simulator/anomalous_data/'
+    #data_file_name = 'anomalous_2.csv'
+    #fields_file_name = 'traffic_fields.csv'
 
     normal_data = read_data(file_path + data_file_name)
     fields = read_fields(file_path + fields_file_name)
@@ -81,10 +85,11 @@ if __name__ == '__main__':
     clusters = []
     clusters.append(cluster(init_samples, alpha, beta, _lambda, mean, cov, gamma))
     anomalies = None
-    cum_anomalies = 4
+    cum_anomalies = 2
     j = 0
     tmp_index = None
-    anomalies_index = 0
+    anomalies_index = np.array([0])
+
     big_anomalies_index = np.zeros(1)
     print "Start update from the ", k, "th instance to the ", num_seqs,"th instance" 
 
@@ -114,13 +119,14 @@ if __name__ == '__main__':
         _,_ = clusters[index].update(new_instance)
 
     # print results and plot informations
+
     num_clusters = len(clusters)
     num_anomalies = len(anomalies_index)-1
-    num_big_anomalies = len(big_anomalies_index)-1
-    big_anomalies_index = np.ndarray.tolist(big_anomalies_index)
-    if num_anomalies == 0 and anomalies != None:
+    if num_anomalies == 0:
         print 'No anomalies are detected!'
         sys.exit()
+    num_big_anomalies = len(big_anomalies_index)-1
+    big_anomalies_index = np.ndarray.tolist(big_anomalies_index)
     print '# of clusters is: ', num_clusters
     print '# of anomalies is: ', num_anomalies
     print '# of big anomalies is: ', num_big_anomalies

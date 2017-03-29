@@ -1,6 +1,6 @@
 clear;clc;
-raw_data = csvread('../../Benchmarks/Time Series Data/IBRL/IBRL_18_25000-28800_temp_hum.csv');
-%raw_data = csvread('../../Benchmarks/Time Series Data/Car_Simulation/Car_RollOverData_1_6D.csv');
+%raw_data = csvread('../../Benchmarks/Time Series Data/IBRL/IBRL_18_25000-28800_temp_hum.csv');
+raw_data = csvread('../../Benchmarks/Time Series Data/Car_Simulation/Car_RollOverData_1_6D.csv');
 
 mean = csvread('new_mean.csv');
 covariance = csvread('new_cov.csv');
@@ -31,7 +31,7 @@ for i = 1: size(mean,1)
     R = [cos(theta),-sin(theta);sin(theta), cos(theta)];
     pts = [mu(1);mu(2)]*ones(size(angle)) + R*[cos(angle)*a; sin(angle)*b];
     
-    if(mod(i,100)==0)
+    if(mod(i,10)==0)
         plot(raw_data(1:i,1), raw_data(1:i,2),'*');
         hold on
     
@@ -39,8 +39,8 @@ for i = 1: size(mean,1)
         ellipse(cov_inv, mu, [1, 0.2, 0.2])
         xlim([-5,10]);
         ylim([-5,10]);
-        xlim([20,70]);
-        ylim([20,45]);
+        %xlim([20,70]);
+        %ylim([20,45]);
     
         pause(0.5)
         hold off
