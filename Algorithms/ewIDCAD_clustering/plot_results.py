@@ -60,7 +60,7 @@ class plot_results():
         #plt.legend(handles = plots)
         
         # plot original data with all anomalies separatly
-
+        '''
         num_plots= 2
         for i in range(len(self.fields)/2):
             plt.figure(5+i)
@@ -71,5 +71,44 @@ class plot_results():
             plt.title('Original data with all anomalies')
             plt.xlabel('Time step')
             plt.ylabel('Data Magnitude')
-            plt.legend(handles = plots)
+            #plt.legend(handles = plots)
+        
+        
+       
+        ground_truth = []     
+        ground_truth.extend(range(100,120))
+        ground_truth.extend(range(300,320))
+        ground_truth.extend(range(500,520))
+        ground_truth.extend(range(700,720))
+        ground_truth.extend(range(1100,1120))
+        ground_truth.extend(range(1300,1320))
+        ground_truth.extend(range(1500,1520))
+        ground_truth.extend(range(1700,1720))
+        
+ 
+        plt.figure(5)
+        plots[1], = plt.plot(range(0,self.num_seqs),self.normal_data[:,0],color = [0, 1,0], label = self.fields[0])
+        plt.plot(self.anomalies_index[:], self.normal_data[self.anomalies_index[:],0],'ro')
+        plt.plot(ground_truth, self.normal_data[ground_truth,0],'o', color = [1,0.78,0.17])
+
+        plots[2], = plt.plot(range(0,self.num_seqs),self.normal_data[:,4],color = [0, 0,1], label = self.fields[4])
+        plt.plot(self.anomalies_index[:], self.normal_data[self.anomalies_index[:],4],'ro')
+        plt.plot(ground_truth, self.normal_data[ground_truth,4],'o', color = [1,0.78,0.17])
+#--------------------------------------------------------------------------
+        plt.figure(6)
+        plots[1], = plt.plot(range(0,self.num_seqs),self.normal_data[:,0],color = [0, 1,0], label = self.fields[0])
+        plt.plot(self.anomalies_index[:], self.normal_data[self.anomalies_index[:],0],'ro')
+        plt.plot(ground_truth, self.normal_data[ground_truth,0],'o', color = [1,0.78,0.17])
+        plots[2], = plt.plot(range(0,self.num_seqs),self.normal_data[:,5],color = [0, 0,1], label = self.fields[5])
+        plt.plot(self.anomalies_index[:], self.normal_data[self.anomalies_index[:],5],'ro')
+        plt.plot(ground_truth, self.normal_data[ground_truth,5],'o', color = [1,0.78,0.17])
+#----------------------------------------------------------------------------
+        plt.figure(7) # 
+        plots[1], = plt.plot(range(0,self.num_seqs),self.normal_data[:,11],color = [0, 1,0], label = self.fields[11])
+        plt.plot(self.anomalies_index[:], self.normal_data[self.anomalies_index[:],11],'ro')
+        plt.plot(ground_truth, self.normal_data[ground_truth,11],'o', color = [1,0.78,0.17])
+        plots[2], = plt.plot(range(0,self.num_seqs),self.normal_data[:,2],color = [0, 0,1], label = self.fields[2])
+        plt.plot(self.anomalies_index[:], self.normal_data[self.anomalies_index[:],2],'ro')
+        plt.plot(ground_truth, self.normal_data[ground_truth,2],'o', color = [1,0.78,0.17])
+'''
         plt.show()
