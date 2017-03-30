@@ -77,9 +77,13 @@ if __name__ == '__main__':
     #data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
     #fields_file_name = 'LG_fields.csv'
 
-    file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
-    data_file_name = 'Car_RollOverData_1_6D.csv'
-    fields_file_name = 'rollover_fields.csv'
+    #file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
+    #data_file_name = 'Car_RollOverData_1_6D.csv'
+    #fields_file_name = 'rollover_fields.csv'
+
+    file_path = '../../Nan_Traffic_Simulator/anomalous_data/'
+    data_file_name = 'anomalous_2.csv'
+    fields_file_name = 'traffic_fields.csv'
 
     normal_data = read_data(file_path + data_file_name)
     fields = read_fields(file_path + fields_file_name)
@@ -102,7 +106,8 @@ if __name__ == '__main__':
     big_anomalies_index = np.zeros(1)
     print "Start update from the ", start, "th instance to the ", num_seqs,"th instance" 
     k = 0
-    curr_cluster = clusters[k]
+    curr_cluster = cluster(init_samples, alpha, beta, _lambda, mean, cov_inv, gamma, tmp, init_type)
+    #curr_cluster = clusters[k]
     
     gamma1 = 0.99
     gamma2 = 0.999
@@ -129,15 +134,6 @@ if __name__ == '__main__':
                 continue
             #clusters.remove(single_cluster)
             update_clusters.append(single_cluster)
-       
-        if i-start ==49 or i-start == 50:
-            print "the mean of the cluster is: "
-            print clusters[0].mean
-            print "the cov_inv of the cluster is: "
-            print clusters[0].cov_inv
-        print "the new instance is: ", new_instance
-        print "the distance from the cluster is", t
-        print "The number of clusters to be updated", update_clusters
         for single_cluster in update_clusters:
             clusters.remove(single_cluster)
             #omega.append(np.exp(-t/2))
@@ -153,11 +149,14 @@ if __name__ == '__main__':
             B = None
         #omega = omega/sum(omega)
 
+
         for j in range(len(update_clusters)):
             update_clusters[j].update(new_instance)
         curr_cluster.update(new_instance)
+
         if j >= 0:
-            clusters.extend(update_clusters) # cannot use append here!
+            clusters.extend(update_clusters) 
+
         if B != None and len(B) > num_sensors+1:
             print 'Iteration ', i-start
             print "number of consequent anomalies: ", len(B)
