@@ -2,6 +2,7 @@ import numpy as np
 import csv
 from clusters import cluster
 from plot_results import plot_results
+from feature_extraction import extractor
 import sys
 from scipy.stats import chi2
 import time
@@ -77,20 +78,28 @@ if __name__ == '__main__':
     #data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
     #fields_file_name = 'LG_fields.csv'
 
-    file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
-    data_file_name = 'Car_NormalData_1_6D.csv'
-    fields_file_name = 'rollover_fields.csv'
+    #file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
+    #data_file_name = 'Car_NormalData_1_6D.csv'
+    #fields_file_name = 'rollover_fields.csv'
 
     #file_path = '../../Nan_Traffic_Simulator/anomalous_data/'
     #data_file_name = 'anomalous_2.csv'
     #fields_file_name = 'traffic_fields.csv'
 
+    file_path = '../../Nan_Traffic_Simulator/anomalous_data/'
+    data_file_name = 'anomalous_5D.csv'
+    fields_file_name = '5D_fields.csv'
+
     normal_data = read_data(file_path + data_file_name)
     fields = read_fields(file_path + fields_file_name)
     num_seqs, num_sensors = normal_data.shape
 
+    # init feature extractor
+    feature_extractor = extractor()
+
     # get initial samples
     init_samples = normal_data[:start][:]
+    init_samples = feature_extractor.extract(init_samples)
     mean = init_samples.mean(axis = 0)
     cov_inv = np.eye(num_sensors)
 
@@ -124,6 +133,9 @@ if __name__ == '__main__':
         update_clusters = []
         print 'Iteration ', i-start
         new_instance = normal_data[i][:]
+        # extract features
+        new_instance = feature_extractor.extract(new_instance)
+ 
         for single_cluster in clusters:
             t = single_cluster.compute_distance(new_instance)
             if t < chi_1:
