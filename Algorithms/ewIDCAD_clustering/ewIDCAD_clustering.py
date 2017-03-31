@@ -101,7 +101,8 @@ if __name__ == '__main__':
     init_samples = normal_data[:start][:]
     init_samples = feature_extractor.extract(init_samples)
     mean = init_samples.mean(axis = 0)
-    cov_inv = np.eye(num_sensors)
+    #cov_inv = np.eye(num_sensors)
+    cov_inv = np.eye(init_samples.shape[1])
 
     # initialize the online updator 
     clusters = []
@@ -132,7 +133,9 @@ if __name__ == '__main__':
         anomaly = True
         update_clusters = []
         print 'Iteration ', i-start
-        new_instance = normal_data[i][:]
+        #new_instance = normal_data[i,:]
+        new_instance = np.reshape(normal_data[i,:], (1,num_sensors))
+        
         # extract features
         new_instance = feature_extractor.extract(new_instance)
  

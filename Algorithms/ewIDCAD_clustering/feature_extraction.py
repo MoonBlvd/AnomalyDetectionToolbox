@@ -5,6 +5,7 @@ class extractor():
     def __init__(self):
         self.num = 2
     def extract(self, data):
+        data.shape
         # y, x_FL and x_Rl
         y = data[:,0]
         x_FL = data[:,1]

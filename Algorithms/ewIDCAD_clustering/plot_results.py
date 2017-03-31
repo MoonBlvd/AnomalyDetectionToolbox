@@ -60,7 +60,7 @@ class plot_results():
         #plt.legend(handles = plots)
         
         # plot original data with all anomalies separatly
-        '''
+        
         num_plots= 2
         for i in range(len(self.fields)/2):
             plt.figure(5+i)
@@ -74,7 +74,7 @@ class plot_results():
             #plt.legend(handles = plots)
         
         
-       
+        ''' 
         ground_truth = []     
         ground_truth.extend(range(100,120))
         ground_truth.extend(range(300,320))

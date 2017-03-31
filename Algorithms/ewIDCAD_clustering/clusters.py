@@ -47,7 +47,8 @@ class cluster():
 
         # update inverse of covariance
         num = np.dot(np.dot(np.dot(A,(x - self.mean).T),(x - self.mean)), A)
-        den = 1 + np.dot(np.dot((x - self.mean).T, A), (x - self.mean))
+        #den = 1 + np.dot(np.dot((x - self.mean).T, A), (x - self.mean))
+        den = 1 + np.dot(np.dot((x - self.mean), A), (x - self.mean).T)
         self.cov_inv = (1/self.tmp) * (A - num / den )
 
         self.cov_inv = (self.sigma**self.overlap_flag) * self.cov_inv + \
