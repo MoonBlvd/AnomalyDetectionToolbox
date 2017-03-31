@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
     file_path = '../../Nan_Traffic_Simulator/anomalous_data/'
     data_file_name = 'anomalous_5D.csv'
-    fields_file_name = '5D_fields.csv'
+    fields_file_name = '2D_fields.csv'
 
     normal_data = read_data(file_path + data_file_name)
     fields = read_fields(file_path + fields_file_name)
@@ -96,10 +96,10 @@ if __name__ == '__main__':
 
     # init feature extractor
     feature_extractor = extractor()
-
+    normal_data = feature_extractor.extract(normal_data)
     # get initial samples
     init_samples = normal_data[:start][:]
-    init_samples = feature_extractor.extract(init_samples)
+    #init_samples = feature_extractor.extract(init_samples)
     mean = init_samples.mean(axis = 0)
     #cov_inv = np.eye(num_sensors)
     cov_inv = np.eye(init_samples.shape[1])
@@ -133,11 +133,11 @@ if __name__ == '__main__':
         anomaly = True
         update_clusters = []
         print 'Iteration ', i-start
-        #new_instance = normal_data[i,:]
-        new_instance = np.reshape(normal_data[i,:], (1,num_sensors))
+        new_instance = normal_data[i,:]
+        #new_instance = np.reshape(normal_data[i,:], (1,num_sensors))
         
         # extract features
-        new_instance = feature_extractor.extract(new_instance)
+        #new_instance = feature_extractor.extract(new_instance)
  
         for single_cluster in clusters:
             t = single_cluster.compute_distance(new_instance)
