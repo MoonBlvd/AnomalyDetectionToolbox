@@ -49,17 +49,20 @@ class cluster():
         num = np.dot(np.dot(np.dot(A,(x - self.mean).T),(x - self.mean)), A)
         #den = 1 + np.dot(np.dot((x - self.mean).T, A), (x - self.mean))
         den = 1 + np.dot(np.dot((x - self.mean), A), (x - self.mean).T)
+        prev_cov_inv = self.cov_inv
         self.cov_inv = (1/self.tmp) * (A - num / den )
+        if np.linalg.norm(self.cov_inv, 2) >= 200:
+            self.cov_inv = prev_cov_inv
 
-        self.cov_inv = (self.sigma**self.overlap_flag) * self.cov_inv + \
-                       (1-self.sigma**self.overlap_flag) * np.eye(len(self.cov_inv)) 
+        #self.cov_inv = (self.sigma**self.overlap_flag) * self.cov_inv + \
+        #               (1-self.sigma**self.overlap_flag) * np.eye(len(self.cov_inv)) 
         '''
         # save the trajectory of means and covs
         meanfile = open('new_mean.csv', 'a')
         writer = csv.writer(meanfile, delimiter = ',')
         writer.writerow(self.mean)
         meanfile.close
-
+        
         cov_inv_file = open('new_cov_inv.csv', 'a')
         writer = csv.writer(cov_inv_file, delimiter = ',')
         for i in range (0, len(self.cov_inv)):

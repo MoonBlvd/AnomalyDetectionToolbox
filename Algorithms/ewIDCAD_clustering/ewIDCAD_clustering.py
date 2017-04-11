@@ -61,6 +61,7 @@ def two_separated(curr_cluster, clusters):
     for single_cluster in clusters:
         norm_1 = np.linalg.norm((curr_cluster.mean-single_cluster.mean), 1)
         p = len(curr_cluster.mean)
+
         max_eigval_1 = max(np.linalg.eigvals(np.linalg.pinv(curr_cluster.cov_inv)))
         max_eigval_2 = max(np.linalg.eigvals(np.linalg.pinv(single_cluster.cov_inv)))
         if norm_1 < 2*np.sqrt(p*max(max_eigval_1, max_eigval_2)):
@@ -84,11 +85,13 @@ if __name__ == '__main__':
 
     #file_path = '../../Nan_Traffic_Simulator/anomalous_data/'
     #data_file_name = 'anomalous_2.csv'
+
     #fields_file_name = 'traffic_fields.csv'
 
     file_path = '../../Nan_Traffic_Simulator/anomalous_data/'
-    data_file_name = 'anomalous_5D.csv'
-    fields_file_name = '2D_fields.csv'
+    data_file_name = 'anomalous_17D_12D_1.csv'
+    fields_file_name = '4D_feature_fields.csv'
+    #fields_file_name = '8D_fields.csv'
 
     normal_data = read_data(file_path + data_file_name)
     fields = read_fields(file_path + fields_file_name)
@@ -102,6 +105,7 @@ if __name__ == '__main__':
     #init_samples = feature_extractor.extract(init_samples)
     mean = init_samples.mean(axis = 0)
     #cov_inv = np.eye(num_sensors)
+    print "init_samples is: ", init_samples
     cov_inv = np.eye(init_samples.shape[1])
 
     # initialize the online updator 
@@ -112,21 +116,16 @@ if __name__ == '__main__':
     cum_anomalies = 2
     j = 0
     tmp_index = None
-    anomalies_index = np.array([0])
-    big_anomalies_index = np.zeros(1)
+    anomalies_index = []
+    big_anomalies_index = []
     print "Start update from the ", start, "th instance to the ", num_seqs,"th instance" 
     k = 0
     curr_cluster = cluster(init_samples, alpha, beta, _lambda, mean, cov_inv, gamma, tmp, init_type)
-    #curr_cluster = clusters[k]
-    
+     
     gamma1 = 0.99
     gamma2 = 0.999
     chi_1 = chi2.ppf(gamma1, num_sensors)
     chi_2 = chi2.ppf(gamma2, num_sensors)
-
-
-    anomalies_index = []
-    big_anomalies_index = []
     #omega = []
     B = None
     for i in range(start, num_seqs):
@@ -166,7 +165,9 @@ if __name__ == '__main__':
 
 
         for j in range(len(update_clusters)):
+            #save_flag = True
             update_clusters[j].update(new_instance)
+            #save_flag = False
         curr_cluster.update(new_instance)
 
         if j >= 0:

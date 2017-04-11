@@ -37,19 +37,20 @@ class plot_results():
         color[:,0] = np.array(range(0, self.num_sensors))/(self.num_sensors-1) #R
         color[:,1] = (np.array(range(self.num_sensors, 0, -1))-1)/(self.num_sensors-1) #G
         color[:,2] = (np.array(range(self.num_sensors, 0, -1))-1)/(self.num_sensors-1) #B
+        color = ['y','m','c','k','g','b']
         for i in range (0, len(self.fields)):
-            plots[i], = plt.plot(range(0,self.num_seqs-self.start),self.normal_data[:,i],'*',color = color[i], label = self.fields[i])
+            plots[i], = plt.plot(range(0,self.num_seqs-self.start),self.normal_data[:,i],color = color[i], label = self.fields[i])
             plt.plot(self.big_anomalies_index, self.normal_data[self.big_anomalies_index,i],'ro')
         plt.title('Original data with big anomalies')
         plt.xlabel('Time step')
         plt.ylabel('Data Magnitude')
-        #plt.legend(handles = plots)
+        plt.legend(handles = plots)
         
         # plot original data with all anomalies
         plt.figure(4)
         plots = [None]*self.num_sensors
         for i in range (0, len(self.fields)):
-            plots[i], = plt.plot(range(0,self.num_seqs-self.start),self.normal_data[:,i],'*',color = color[i], label = self.fields[i])
+            plots[i], = plt.plot(range(0,self.num_seqs-self.start),self.normal_data[:,i],color = color[i], label = self.fields[i])
             plt.plot(self.anomalies_index[1:], self.normal_data[self.anomalies_index[1:],i],'ro')
         plt.title('Original data with all anomalies')
         plt.xlabel('Time step')

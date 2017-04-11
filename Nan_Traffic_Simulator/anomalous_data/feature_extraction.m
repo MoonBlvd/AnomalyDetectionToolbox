@@ -20,3 +20,4 @@ plot(range, f_2);
 
 features = [f_1 f_2];
 csvwrite('features.csv', features);
+
