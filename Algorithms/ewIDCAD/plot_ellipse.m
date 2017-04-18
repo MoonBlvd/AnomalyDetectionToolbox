@@ -35,7 +35,7 @@ for i = 1: size(mean,1)
     R = [cos(theta),-sin(theta);sin(theta), cos(theta)];
     pts = [mu(1);mu(2)]*ones(size(angle)) + R*[cos(angle)*a; sin(angle)*b];
     
-    %if(mod(i,10)==0)
+    if(mod(i,10)==0)
         j = j+1;
         tmp_img = plot(raw_data(1:i+start,1), raw_data(1:i+start,2),'*');
         xlabel('lateral pos [m]');
@@ -43,18 +43,19 @@ for i = 1: size(mean,1)
         hold on
         %plot(pts(1,:), pts(2,:), 'r');
         ellipse(cov_inv, mu, [1, 0.2, 0.2])
-        xlim([-5,10]);
-        ylim([-5,10]);
-        F(j) = getframe(gcf);
+        xlim([-5,5]);
+        ylim([-5,5]);
+%         F(j) = getframe(gcf);
         %xlim([20,70]);
         %ylim([20,45]);
-    
-        %pause(0.5)
+        title(['Time step ',num2str(i)]);
+        set(gca,'fontsize',20)
+        pause(0.5)
         hold off
 
-    %end
+    end
 end    
-video = VideoWriter('model.avi');
-open(video);
-writeVideo(video, F);
-close(video);
+% video = VideoWriter('model.avi');
+% open(video);
+% writeVideo(video, F);
+% close(video);
