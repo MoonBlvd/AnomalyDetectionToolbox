@@ -14,26 +14,45 @@ import csv
     #np.sum((elements-mean)**2/den, axis = 1)
 
 class cluster():
-    def __init__(self, elements, alpha, beta, _lambda, mean, cov, gamma, tmp = 0.5):
+    def __init__(self, elements, _lambda, mean, cov, gamma, algorithm):
+        self.k = 3 # number of iterations
+
         self.elements = elements # initial the elements of this cluster
-        self.alpha = alpha
-        self.beta = beta
-        self.tmp = tmp
+        print 'initial elements are: ', self.elements
         self._lambda = _lambda
-        self.mean = mean
-        self.cov = cov
-        self.cov_inv = np.eye(len(self.cov)) # Initialize as identical matrix
+        if algorithm == 'ewIDCAD':
+            self.alpha = 0
+            self.beta = 0
+            mean_num = 0
+            cov_term_2 = 0
+            for i in range(self.k):
+                self.alpha += self._lambda**(self.k-i-1)
+                self.beta += self._lambda**(2*(self.k-i-1))
+                mean_num += (self._lambda**(self.k-i-1))*self.elements[i] 
+                cov_term_2 += (self._lambda**(self.k-i-1))* \
+                              np.dot(self.elements[i:i+1].T,(self.elements[i:i+1]))
+            self.tmp = self.alpha/(self.alpha**2-self.beta)
+            self.mean = mean_num/self.alpha 
+
+            self.cov = self.tmp*cov_term_2
+            self.cov_inv = np.linalg.inv(self.cov) # Initialize as identical matrix
+            self.cov_inv = np.eye(len(cov))
+
+        else:
+            self.mean = mean
+            #self.cov_inv = np.linalg.inv(cov)
+            self.cov_inv = np.eye(len(cov))
         self.gamma = gamma
- 
+
         # parameters for model reset
         self.sigma = 1
         self.overlap_flag = 0
         # initialize the chi_square of the cluster
         #self.chi_square = 1/chi2.ppf((1-self.gamma), len(cov))
-        self.chi_square = chi2.ppf(self.gamma, len(self.cov))
+        self.chi_square = chi2.ppf(self.gamma, len(cov))
         print "self.chi_square is: ", self.chi_square
 
-    def update(self, x):
+    def update_ewIDCAD(self, x):
         # here x should be 1*W array where W is the number of features
         self.elements = np.vstack([self.elements, x])
         # update parameters
@@ -44,7 +63,6 @@ class cluster():
         new_tmp = self.alpha/(self.alpha**2-self.beta)
         # update mean
         self.mean = self.mean + (x - self.mean)/self.alpha
-        self.cov = new_tmp*((self._lambda/self.tmp)*self.cov + np.dot((x-self.mean).T,x-self.mean))
         self.tmp = new_tmp
 
         # update inverse of covariance
@@ -53,18 +71,61 @@ class cluster():
         self.cov_inv = (1/self.tmp) * (A - num / den )
         self.cov_inv = (self.sigma**self.overlap_flag) * self.cov_inv + \
                        (1-self.sigma**self.overlap_flag) * np.eye(len(self.cov_inv)) 
-        
         # save the trajectory of means and covs
         meanfile = open('new_mean.csv', 'a')
         writer = csv.writer(meanfile, delimiter = ',')
         writer.writerow(self.mean)
         meanfile.close
 
-        covfile = open('new_cov.csv', 'a')
-        writer = csv.writer(covfile, delimiter = ',')
-        for i in range (0, len(self.cov)):
-            writer.writerow(self.cov[i])
-        covfile.close
+        cov_inv_file = open('new_cov_inv.csv', 'a')
+        writer = csv.writer(cov_inv_file, delimiter = ',')
+        for i in range (0, len(self.cov_inv)):
+            writer.writerow(self.cov_inv[i])
+        cov_inv_file.close
+        
+        return self.mean, self.cov_inv
+    def update_ffIDCAD(self, x):
+        # here x should be 1*W array where W is the number of features
+        self.elements = np.vstack([self.elements, x])
+        self.k += 1
+        # update mean
+        self.mean = self._lambda*self.mean + (1-self._lambda)*x
+        # update inverse of covariance
+        num = np.dot(np.dot((x - self.mean).T, (x - self.mean)), self.cov_inv)
+        den = (self.k-1)/self._lambda + np.dot(np.dot((x - self.mean), self.cov_inv), (x - self.mean).T)
+        self.cov_inv = (self.k*self.cov_inv/(self._lambda*(self.k-1))) * (np.eye(len(self.mean)) - num / den )
+        #self.cov_inv = (self.sigma**self.overlap_flag) * self.cov_inv + \
+        #               (1-self.sigma**self.overlap_flag) * np.eye(len(self.cov_inv)) 
+        #  save the trajectory of means and covs
+        meanfile = open('new_mean.csv', 'a')
+        writer = csv.writer(meanfile, delimiter = ',')
+        writer.writerow(self.mean)
+        meanfile.close
+
+        cov_inv_file = open('new_cov_inv.csv', 'a')
+        writer = csv.writer(cov_inv_file, delimiter = ',')
+        for i in range (0, len(self.cov_inv)):
+            writer.writerow(self.cov_inv[i])
+        cov_inv_file.close
+        
+        return self.mean, self.cov_inv
+    def update_IDCAD(self, x):
+        # here x should be 1*W array where W is the number of features
+        self.elements = np.vstack([self.elements, x])
+        self.k += 1
+        # update mean
+        self.mean = self.mean+(1/(self.k+1))*(x-self.mean)
+        # update inverse of covariance
+        num = np.dot(np.dot((x - self.mean).T, (x - self.mean)), self.cov_inv)
+        den = (self.k**2-1)/self.k + np.dot(np.dot((x - self.mean), self.cov_inv), (x - self.mean).T)
+        self.cov_inv = (self.k*self.cov_inv/(self.k-1)) * (np.eye(len(self.mean)) - num / den )
+        #self.cov_inv = (self.sigma**self.overlap_flag) * self.cov_inv + \
+        #               (1-self.sigma**self.overlap_flag) * np.eye(len(self.cov_inv)) 
+        #  save the trajectory of means and covs
+        meanfile = open('new_mean.csv', 'a')
+        writer = csv.writer(meanfile, delimiter = ',')
+        writer.writerow(self.mean)
+        meanfile.close
 
         cov_inv_file = open('new_cov_inv.csv', 'a')
         writer = csv.writer(cov_inv_file, delimiter = ',')

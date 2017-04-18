@@ -44,7 +44,7 @@ class plot_results():
         plt.title('Original data with big anomalies')
         plt.xlabel('Time step')
         plt.ylabel('Data Magnitude')
-        plt.legend(handles = plots)
+        #plt.legend(handles = plots)
         
         # plot original data with all anomalies
         plt.figure(4)
@@ -55,6 +55,6 @@ class plot_results():
         plt.title('Original data with all anomalies')
         plt.xlabel('Time step')
         plt.ylabel('Data Magnitude')
-        plt.legend(handles = plots)
+        #plt.legend(handles = plots)
 
         plt.show()

@@ -55,22 +55,28 @@ def read_fields(file_path):
             return line
 
 if __name__ == '__main__':
+    algorithm = sys.argv[1] # the algorithm we use
+
     # read data and fields
-    #file_path = '../../Benchmarks/Time Series Data/IBRL/'
+    file_path = '../../Benchmarks/Time Series Data/LG/'
     #data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
     #fields_file_name = 'IBRL_fields.csv'
     #data_file_name = 'GSB_12_Oct_temp_humi_mean.csv'
     #fields_file_name = 'GSB_fields.csv'
-    #data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
-    #fields_file_name = 'LG_fields.csv'
+    data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
+    fields_file_name = 'LG_fields.csv'
 
-    file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
-    data_file_name = 'Car_RollOverData_1_6D.csv'
-    fields_file_name = 'rollover_fields.csv'
+    #file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
+    #data_file_name = 'Car_RollOverData_1_6D.csv'
+    #fields_file_name = 'rollover_fields.csv'
 
     #file_path = '../../Nan_Traffic_Simulator/anomalous_data/'
     #data_file_name = 'anomalous_2.csv'
     #fields_file_name = 'traffic_fields.csv'
+
+    #file_path = '../originalEwIDCAD/'
+    #data_file_name = 'S1.csv'
+    #fields_file_name = 'S_fields.csv'
 
     normal_data = read_data(file_path + data_file_name)
     fields = read_fields(file_path + fields_file_name)
@@ -83,9 +89,9 @@ if __name__ == '__main__':
 
     # initialize the online updator 
     clusters = []
-    clusters.append(cluster(init_samples, alpha, beta, _lambda, mean, cov, gamma))
+    clusters.append(cluster(init_samples, _lambda, mean, cov, gamma, algorithm))
     anomalies = None
-    cum_anomalies = 2
+    cum_anomalies = 4
     j = 0
     tmp_index = None
     anomalies_index = np.array([0])
@@ -116,7 +122,12 @@ if __name__ == '__main__':
                 big_anomalies_index = np.vstack([big_anomalies_index, tmp_index])
             j = 0
             tmp_index = None
-        _,_ = clusters[index].update(new_instance)
+        if algorithm == 'ewIDCAD':
+            _,_ = clusters[index].update_ewIDCAD(new_instance)
+        elif algorithm == 'ffIDCAD':
+            _,_ = clusters[index].update_ffIDCAD(new_instance)
+        elif algorithm == 'IDCAD':
+            _,_ = clusters[index].update_IDCAD(new_instance)
 
     # print results and plot informations
 
