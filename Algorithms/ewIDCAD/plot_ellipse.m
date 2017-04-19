@@ -2,6 +2,7 @@ clear;clc;
 %raw_data = csvread('../../Benchmarks/Time Series Data/IBRL/IBRL_18_25000-28800_temp_hum.csv');
 %raw_data = csvread('../../Benchmarks/Time Series Data/Car_Simulation/Car_RollOverData_1_6D.csv');
 raw_data = csvread('../../Benchmarks/Time Series Data/LG/LG_18_Oct_temp_humi_mean.csv');
+%raw_data = csvread('../../Benchmarks/Time Series Data/GSB/GSB_12_Oct_temp_humi_mean.csv');
 
 mean = csvread('new_mean.csv');
 %covariance = csvread('new_cov.csv');
@@ -36,7 +37,7 @@ for i = 1: size(mean,1)
     R = [cos(theta),-sin(theta);sin(theta), cos(theta)];
     pts = [mu(1);mu(2)]*ones(size(angle)) + R*[cos(angle)*a; sin(angle)*b];
     
-    if(i==100 || i == 1000 || i == 2843)
+    if(i==97 || i == 997 || i == 2843)
         j = j+1;
         tmp_img = plot(raw_data(1:i+start,1), raw_data(1:i+start,2),'o');
         xlabel('Feature_1');

@@ -56,15 +56,19 @@ def read_fields(file_path):
 
 if __name__ == '__main__':
     algorithm = sys.argv[1] # the algorithm we use
-
+    data_name = sys.argv[2] # name of the dataset we tested on 
     # read data and fields
-    file_path = '../../Benchmarks/Time Series Data/IBRL/'
-    data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
-    fields_file_name = 'IBRL_fields.csv'
-    #data_file_name = 'GSB_12_Oct_temp_humi_mean.csv'
-    #fields_file_name = 'GSB_fields.csv'
-    #data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
-    #fields_file_name = 'LG_fields.csv'
+    
+    file_path = '../../Benchmarks/Time Series Data/'+data_name+'/'
+    if data_name == 'IBRL':
+        data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
+        #fields_file_name = 'IBRL_fields.csv'
+    elif data_name == 'GSB':    
+        data_file_name = 'GSB_12_Oct_temp_humi_mean.csv'
+        #fields_file_name = 'GSB_fields.csv'
+    elif data_name == 'LG':
+        data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
+    fields_file_name = data_name + '_fields.csv'
 
     #file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
     #data_file_name = 'Car_RollOverData_1_6D.csv'

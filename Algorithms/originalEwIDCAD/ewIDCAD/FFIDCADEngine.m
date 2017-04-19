@@ -1,11 +1,12 @@
 clear;clc;
 load data
-IBRL18=csvread('../../../Benchmarks/Time Series Data/IBRL/IBRL_18_25000-28800_temp_hum.csv');
+%IBRL18=csvread('../../../Benchmarks/Time Series Data/IBRL/IBRL_18_25000-28800_temp_hum.csv');
+GSB12=csvread('../../../Benchmarks/Time Series Data/GSB/GSB_12_Oct_temp_humi_mean.csv');
 D=2;
 Ts=0.98; % gamma
 Threshold1 = chi2inv(Ts,D);
 Isplot=1;
-Reduced = IBRL18;%LG12;%
+Reduced = GSB12;%IBRL18;%LG18;%
 
 %Reduced1 = [[0:0.1:30]', rand(301,1)];
 %Reduced2 = [31*ones(1000,1), rand(1000,1)];%+rand(1000,1)/2-1
