@@ -103,7 +103,7 @@ if __name__ == '__main__':
     # initialize the online updator 
     clusters = []
     init_type = 'normal'
-    clusters.append(cluster(init_samples, alpha, beta, _lambda, mean, cov_inv, gamma, tmp, init_type))
+    clusters.append(cluster(init_samples, alpha, beta, _lambda, mean, cov_inv, gamma, init_type))
     anomalies = None
     cum_anomalies = 2
     j = 0
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     big_anomalies_index = []
     print "Start update from the ", start, "th instance to the ", num_seqs,"th instance" 
     k = 0
-    curr_cluster = cluster(init_samples, alpha, beta, _lambda, mean, cov_inv, gamma, tmp, init_type)
+    curr_cluster = cluster(init_samples, alpha, beta, _lambda, mean, cov_inv, gamma, init_type)
      
     gamma1 = 0.99
     gamma2 = 0.999
