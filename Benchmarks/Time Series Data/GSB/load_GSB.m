@@ -1,5 +1,5 @@
 clear;clc;
-data = textread('rawGSB_day_14_24.txt');
+data = textread('rawGSB_day_15_25.txt');
 
 date = data(:,4);
 temperature = data(:,10);
