@@ -14,11 +14,10 @@ import csv
     #np.sum((elements-mean)**2/den, axis = 1)
 
 class cluster():
-    def __init__(self, elements, alpha, beta, _lambda, mean, cov_inv, gamma, tmp, cluster_type):
+    def __init__(self, elements, alpha, beta, _lambda, mean, cov_inv, gamma, cluster_type):
         self.elements = elements # initial the elements of this cluster
         self.alpha = alpha
         self.beta = beta
-        self.tmp = tmp
         self._lambda = _lambda
         self.mean = mean
         self.cov_inv = cov_inv # Initialize as identical matrix
@@ -36,6 +35,7 @@ class cluster():
         # here x should be 1*W array where W is the number of features
         self.elements = np.vstack([self.elements, x])
         # update parameters
+        self.tmp = self.alpha/(self.alpha**2-self.beta)
         A = self.cov_inv/(self._lambda / self.tmp) # Note that this is the A_{k-1}
         self.alpha = self.alpha*self._lambda + 1
         self.beta = self.beta*self._lambda**2 + 1
@@ -46,9 +46,10 @@ class cluster():
         self.tmp = new_tmp
 
         # update inverse of covariance
-        num = np.dot(np.dot(np.dot(A,(x - self.mean).T),(x - self.mean)), A)
+        diff = (x-self.mean)[None] # make it to be 2D array, 1*2
+        num = np.dot(np.dot(np.dot(A,diff.T),diff), A)
         #den = 1 + np.dot(np.dot((x - self.mean).T, A), (x - self.mean))
-        den = 1 + np.dot(np.dot((x - self.mean), A), (x - self.mean).T)
+        den = 1 + np.dot(np.dot(diff, A), diff.T)
         prev_cov_inv = self.cov_inv
         self.cov_inv = (1/self.tmp) * (A - num / den )
         if np.linalg.norm(self.cov_inv, 2) >= 200:

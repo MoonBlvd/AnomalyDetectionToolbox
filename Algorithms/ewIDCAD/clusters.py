@@ -20,6 +20,7 @@ class cluster():
         self.elements = elements # initial the elements of this cluster
         print 'initial elements are: ', self.elements
         self._lambda = _lambda
+        '''
         if algorithm == 'ewIDCAD':
             self.alpha = 0
             self.beta = 0
@@ -39,10 +40,14 @@ class cluster():
             self.cov_inv = np.eye(len(cov))
 
         else:
-            self.mean = mean
-            #self.cov_inv = np.linalg.inv(cov)
-            self.cov_inv = np.eye(len(cov))
+        '''
+        self.alpha = 2
+        self.beta = 2
+        self.mean = mean
+        #self.cov_inv = np.linalg.inv(cov)
+        self.cov_inv = np.eye(len(cov))
         self.gamma = gamma
+
 
         # parameters for model reset
         self.sigma = 1
@@ -56,6 +61,7 @@ class cluster():
         # here x should be 1*W array where W is the number of features
         self.elements = np.vstack([self.elements, x])
         # update parameters
+        self.tmp = self.alpha/(self.alpha**2-self.beta)
         A = self.cov_inv/(self._lambda / self.tmp) # Note that this is the A_{k-1}
         self.alpha = self.alpha*self._lambda + 1
         self.beta = self.beta*self._lambda**2 + 1
@@ -66,12 +72,14 @@ class cluster():
         self.tmp = new_tmp
 
         # update inverse of covariance
-        num = np.dot(np.dot(np.dot(A,(x - self.mean).T),(x - self.mean)), A)
-        den = 1 + np.dot(np.dot((x - self.mean).T, A), (x - self.mean))
+        diff = (x-self.mean)[None] # make it to be 2D array, 1*2
+        num = np.dot(np.dot(np.dot(A,diff.T),diff), A)
+        den = 1 + np.dot(np.dot(diff, A), diff.T)
         self.cov_inv = (1/self.tmp) * (A - num / den )
-        self.cov_inv = (self.sigma**self.overlap_flag) * self.cov_inv + \
-                       (1-self.sigma**self.overlap_flag) * np.eye(len(self.cov_inv)) 
+        #self.cov_inv = (self.sigma**self.overlap_flag) * self.cov_inv + \
+        #               (1-self.sigma**self.overlap_flag) * np.eye(len(self.cov_inv)) 
         # save the trajectory of means and covs
+
         meanfile = open('new_mean.csv', 'a')
         writer = csv.writer(meanfile, delimiter = ',')
         writer.writerow(self.mean)
@@ -91,8 +99,9 @@ class cluster():
         # update mean
         self.mean = self._lambda*self.mean + (1-self._lambda)*x
         # update inverse of covariance
-        num = np.dot(np.dot((x - self.mean).T, (x - self.mean)), self.cov_inv)
-        den = (self.k-1)/self._lambda + np.dot(np.dot((x - self.mean), self.cov_inv), (x - self.mean).T)
+        diff = (x-self.mean)[None] # make it to be 2D array, 1*2
+        num = np.dot(np.dot(diff.T, diff), self.cov_inv)
+        den = (self.k-1)/self._lambda + np.dot(np.dot(diff, self.cov_inv), diff.T)
         self.cov_inv = (self.k*self.cov_inv/(self._lambda*(self.k-1))) * (np.eye(len(self.mean)) - num / den )
         #self.cov_inv = (self.sigma**self.overlap_flag) * self.cov_inv + \
         #               (1-self.sigma**self.overlap_flag) * np.eye(len(self.cov_inv)) 
@@ -116,8 +125,9 @@ class cluster():
         # update mean
         self.mean = self.mean+(1/(self.k+1))*(x-self.mean)
         # update inverse of covariance
-        num = np.dot(np.dot((x - self.mean).T, (x - self.mean)), self.cov_inv)
-        den = (self.k**2-1)/self.k + np.dot(np.dot((x - self.mean), self.cov_inv), (x - self.mean).T)
+        diff = (x-self.mean)[None] # make it to be 2D array, 1*2
+        num = np.dot(np.dot(diff.T, diff), self.cov_inv)
+        den = (self.k**2-1)/self.k + np.dot(np.dot(diff, self.cov_inv), diff.T)
         self.cov_inv = (self.k*self.cov_inv/(self.k-1)) * (np.eye(len(self.mean)) - num / den )
         #self.cov_inv = (self.sigma**self.overlap_flag) * self.cov_inv + \
         #               (1-self.sigma**self.overlap_flag) * np.eye(len(self.cov_inv)) 

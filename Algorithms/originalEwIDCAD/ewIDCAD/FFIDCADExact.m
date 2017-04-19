@@ -6,14 +6,15 @@
 %=======================================================
 function [A,C,wSum,wPowerSum]= FFIDCADExact(PrevA, PrevC,Lambda,wSum,wPowerSum, X)
 
-m2 = Lambda*(wSum^2-wPowerSum)/wSum;
-PrevA = PrevA/m2;
-wSum=Lambda*wSum+1;
-wPowerSum=Lambda^2*wPowerSum+1;
-m1= wSum/(wSum^2-wPowerSum);
+m2 = Lambda*(wSum^2-wPowerSum)/wSum; % lambda/Chi
+PrevA = PrevA/m2; % A_{k-1} = S_{k-1}^{-1}/(lambda/Chi)
+wSum=Lambda*wSum+1; % alpha_{k} = lambda * alpha_{k-1} +1
+wPowerSum=Lambda^2*wPowerSum+1;% beta_{k} = lambda^2 * beta_{k-1}+1
+m1= wSum/(wSum^2-wPowerSum); % Chi = alpha / (alpha^2 - beta)
 
-C = PrevC+(1/wSum)*(X-PrevC);
-temp1 = 1+(X-C)*PrevA*(X -C)';
+C = PrevC+(1/wSum)*(X-PrevC); % mean = mean + (x-mean)/alpha
+temp1 = 1+(X-C)*PrevA*(X -C)'; % den = (x-mean)^T*A*(x-mean)
+num = PrevA*(X-C)'*(X-C)*PrevA;
 A = PrevA-((PrevA*(X-C)'*(X-C)*PrevA)/temp1);
 A = A/m1;
 

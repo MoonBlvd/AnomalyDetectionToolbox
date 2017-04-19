@@ -14,7 +14,7 @@ alpha = 2 # initialize alpha and beta
 beta = 2 #
 start = 0 # skip the first 50 points
 k = 3 # k-stary is the num of initial samples
-stablization = 10
+stablization = 9
 classify_type = 'chi_square'
 #classify_type = '3_sigma'
 
@@ -58,13 +58,13 @@ if __name__ == '__main__':
     algorithm = sys.argv[1] # the algorithm we use
 
     # read data and fields
-    file_path = '../../Benchmarks/Time Series Data/LG/'
-    #data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
-    #fields_file_name = 'IBRL_fields.csv'
+    file_path = '../../Benchmarks/Time Series Data/IBRL/'
+    data_file_name = 'IBRL_18_25000-28800_temp_hum.csv'
+    fields_file_name = 'IBRL_fields.csv'
     #data_file_name = 'GSB_12_Oct_temp_humi_mean.csv'
     #fields_file_name = 'GSB_fields.csv'
-    data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
-    fields_file_name = 'LG_fields.csv'
+    #data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
+    #fields_file_name = 'LG_fields.csv'
 
     #file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
     #data_file_name = 'Car_RollOverData_1_6D.csv'
@@ -100,11 +100,13 @@ if __name__ == '__main__':
     print "Start update from the ", k, "th instance to the ", num_seqs,"th instance" 
 
     for i in range(k, num_seqs):
-        print 'Iteration ', i-k
+        print 'Iteration ', i
         new_instance = normal_data[i][:]
         # classify the new instance, f is the cluster label
         distance, index = find_min_distance(clusters, new_instance)
         f = clusters[index].classify(index, distance, new_instance, classify_type) 
+        print "mahalanobis distance is:", distance
+
         if f == np.inf: # add new anomaly to a temperal anomaly list.
             if i > stablization:
                 if tmp_index == None:
@@ -117,11 +119,11 @@ if __name__ == '__main__':
                 anomalies_index = np.vstack([anomalies_index, i])
                 j += 1
         else: # no new anomalies detected, reset the temperal anomaly list.
-            if j > cum_anomalies: # if there are consecutive anomalies
-                print"the anomalies are: ", anomalies
-                big_anomalies_index = np.vstack([big_anomalies_index, tmp_index])
             j = 0
             tmp_index = None
+        if j > cum_anomalies: # if there are consecutive anomalies
+            print"the anomalies are: ", anomalies
+            big_anomalies_index = np.vstack([big_anomalies_index, tmp_index])
         if algorithm == 'ewIDCAD':
             _,_ = clusters[index].update_ewIDCAD(new_instance)
         elif algorithm == 'ffIDCAD':
