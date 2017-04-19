@@ -79,17 +79,9 @@ if __name__ == '__main__':
     #data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
     #fields_file_name = 'LG_fields.csv'
 
-    #file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
-    #data_file_name = 'Car_NormalData_1_6D.csv'
-    #fields_file_name = 'rollover_fields.csv'
-
     #file_path = '../../Nan_Traffic_Simulator/anomalous_data/'
-    #data_file_name = 'anomalous_2.csv'
-
-    #fields_file_name = 'traffic_fields.csv'
-
-    file_path = '../../Nan_Traffic_Simulator/anomalous_data/'
-    data_file_name = 'anomalous_17D_12D_1.csv'
+    file_path = '../../Nan_Traffic_Simulator/04132017_data/'
+    data_file_name = 'anomalous_17D_8D_6.csv'
     fields_file_name = '4D_feature_fields.csv'
     #fields_file_name = '8D_fields.csv'
 

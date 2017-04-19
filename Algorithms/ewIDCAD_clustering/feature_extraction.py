@@ -6,8 +6,8 @@ class extractor():
     def __init__(self):
         self.num = 2
         self.w_1 = 2
-        #self.w_2 = 1
-        self.w_2 = 0.1
+        self.w_2 = 1
+        #self.w_2 = 0.1
         self.sigma_12 = -5
         self.w_3 = 1
         self.w_4 = 1
@@ -21,13 +21,13 @@ class extractor():
         y = data[:,0]
         x_FL = data[:,1]
         x_RL = data[:,3]
-        x_FL_dot = data[:,8]
-        x_RL_dot = data[:,10]
+        #x_FL_dot = data[:,8]
+        #x_RL_dot = data[:,10]
         # y, x_FR and x_RR
         x_FR = data[:,2]
         x_RR = data[:,4]
-        x_FR_dot = data[:,9]
-        x_RR_dot = data[:,11]
+        #x_FR_dot = data[:,9]
+        #x_RR_dot = data[:,11]
         # x_dot, x_FC and x_FC_dot
         x_FC = data[:,5]
         x_FC_dot = data[:,6]
@@ -45,11 +45,11 @@ class extractor():
         f_1 = np.zeros([len(y), 1])
         for i in range(len(y)):
             if y[i] >= 5.4:
-                #f_1[i] = 1/(1 + np.exp(self.w_1*(9-y[i]) + self.w_2*min(x_FL[i], x_RL[i]) + self.sigma_12))
-                f_1[i] = 1/(1 + np.exp(self.w_1*(9-y[i]) + self.w_2*min(x_FL[i]+self.w_5*(x_FL_dot[i]-x_dot[i]), x_RL[i]+self.w_5*(x_dot[i]-x_RL_dot[i])) + self.w_2*self.sigma_12))
+                f_1[i] = 1/(1 + np.exp(self.w_1*(9-y[i]) + self.w_2*min(x_FL[i], x_RL[i]) + self.sigma_12))
+                #f_1[i] = 1/(1 + np.exp(self.w_1*(9-y[i]) + self.w_2*min(x_FL[i]+self.w_5*(x_FL_dot[i]-x_dot[i]), x_RL[i]+self.w_5*(x_dot[i]-x_RL_dot[i])) + self.w_2*self.sigma_12))
             else:
-                #f_1[i] = 1/(1 + np.exp(self.w_1*(5.4-y[i]) + self.w_2*min(x_FL[i], x_RL[i]) + self.sigma_12))
-                f_1[i] = 1/(1 + np.exp(self.w_1*(5.4-y[i]) + self.w_2*min(x_FL[i]+self.w_5*(x_FL_dot[i]-x_dot[i]), x_RL[i]+self.w_5*(x_dot[i]-x_RL_dot[i])) + self.w_2*self.sigma_12))
+                f_1[i] = 1/(1 + np.exp(self.w_1*(5.4-y[i]) + self.w_2*min(x_FL[i], x_RL[i]) + self.sigma_12))
+                #f_1[i] = 1/(1 + np.exp(self.w_1*(5.4-y[i]) + self.w_2*min(x_FL[i]+self.w_5*(x_FL_dot[i]-x_dot[i]), x_RL[i]+self.w_5*(x_dot[i]-x_RL_dot[i])) + self.w_2*self.sigma_12))
 
 
         #f_2 = np.exp(5.4-y)/(x_FR * x_RR + 1)
@@ -63,11 +63,11 @@ class extractor():
         f_2 = np.zeros([len(y), 1])
         for i in range(len(y)):
             if y[i] > 5.4:
-                #f_2[i] = 1/(1 + np.exp(self.w_1*(y[i]-5.4) + self.w_2*min(x_FR[i], x_RR[i]) + self.sigma_12))
-                f_2[i] = 1/(1 + np.exp(self.w_1*(y[i]-5.4) + self.w_2*min(x_FR[i]+self.w_5*(x_FR_dot[i]-x_dot[i]), x_RR[i]+self.w_5*(x_dot[i]-x_RR_dot[i])) + self.w_2*self.sigma_12))
+                f_2[i] = 1/(1 + np.exp(self.w_1*(y[i]-5.4) + self.w_2*min(x_FR[i], x_RR[i]) + self.sigma_12))
+                #f_2[i] = 1/(1 + np.exp(self.w_1*(y[i]-5.4) + self.w_2*min(x_FR[i]+self.w_5*(x_FR_dot[i]-x_dot[i]), x_RR[i]+self.w_5*(x_dot[i]-x_RR_dot[i])) + self.w_2*self.sigma_12))
             else:
-                #f_2[i] = 1/(1 + np.exp(self.w_1*(y[i]-1.8) + self.w_2*min(x_FR[i], x_RR[i]) + self.sigma_12))
-                f_2[i] = 1/(1 + np.exp(self.w_1*(y[i]-1.8) + self.w_2*min(x_FR[i]+self.w_5*(x_FR_dot[i]-x_dot[i]), x_RR[i]+self.w_5*(x_dot[i]-x_RR_dot[i])) + self.w_2*self.sigma_12))
+                f_2[i] = 1/(1 + np.exp(self.w_1*(y[i]-1.8) + self.w_2*min(x_FR[i], x_RR[i]) + self.sigma_12))
+                #f_2[i] = 1/(1 + np.exp(self.w_1*(y[i]-1.8) + self.w_2*min(x_FR[i]+self.w_5*(x_FR_dot[i]-x_dot[i]), x_RR[i]+self.w_5*(x_dot[i]-x_RR_dot[i])) + self.w_2*self.sigma_12))
 
 
         

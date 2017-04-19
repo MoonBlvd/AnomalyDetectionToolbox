@@ -43,18 +43,20 @@ class plot_results():
         color[:,1] = (np.array(range(0, self.num_sensors)))/(self.num_sensors-1) #G
         color[:,2] = (np.array(range(self.num_sensors, 0, -1))-1)/(self.num_sensors-1) #B
         color = ['y','m','c','k','g','b']
-        color = np.array([[255,255,0], [255,0,255], [255,123,0], [123,123,0], [0,255,0], [0,0,255], [0,0,0], [123,0,255], [0,255,255]])/255
+        #color = np.array([[255,255,0], [255,0,255], [255,123,0], [123,123,0], [0,255,0], [0,0,255], [0,0,0], [123,0,255], [0,255,255]])/255
 
         for i in range (0, len(self.fields)):
             plots[i], = plt.plot(range(0,self.num_seqs),self.normal_data[:,i],color = color[i], label = self.fields[i])
             #plt.plot(self.big_anomalies_index, self.normal_data[self.big_anomalies_index,i],'ro')
         #plt.title('Extracted features')
-        plt.title('8-D raw data')
+        #plt.title('8-D raw data')
+        plt.title('4-D features')
 
         plt.xlabel('Time step')
         plt.ylabel('data Magnitude')
-        plt.xlim((0,2000))
-        #plt.ylim(-0.1,1.1)
+        plt.xlim((-50,2050))
+        plt.ylim(-0.1,1.1)
+        #plt.ylim(-30,110)
         plt.legend(handles = plots)
         
         # plot original data with all anomalies
@@ -69,8 +71,9 @@ class plot_results():
         plt.xlabel('Time step')
         #plt.ylabel('Feature Magnitude')
         plt.ylabel('Data Magnitude')
-        plt.xlim((0,2000))
-        #plt.ylim(-0.1,1.1)
+        plt.xlim((-50,2050))
+        plt.ylim(-0.1,1.1)
+        #plt.ylim(-30,110)
         plt.legend(handles = plots)
         
         '''

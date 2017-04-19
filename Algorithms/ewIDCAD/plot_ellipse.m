@@ -47,9 +47,11 @@ for i = 1: size(mean,1)
         xlim([-15,15]);
         ylim([5,100]);
         %F(j) = getframe(gcf);
+%         F(j) = getframe(gcf);
         %xlim([20,70]);
         %ylim([20,45]);
-    
+        %title(['Time step ',num2str(i)]);
+        %set(gca,'fontsize',20)
         %pause(0.5)
         hold off
 
