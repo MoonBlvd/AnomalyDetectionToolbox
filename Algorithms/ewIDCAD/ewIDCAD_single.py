@@ -68,19 +68,14 @@ if __name__ == '__main__':
         #fields_file_name = 'GSB_fields.csv'
     elif data_name == 'LG':
         data_file_name = 'LG_18_Oct_temp_humi_mean.csv'
+    elif data_name == 'gas':
+        data_file_name = 'ethylene_CO_5mins.csv'
+    elif data_name == 'rollover':
+        file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
+        data_file_name = 'Car_RollOverData_1_6D.csv'
+    else:
+        data_file_name = data_name + '.csv'
     fields_file_name = data_name + '_fields.csv'
-
-    #file_path = '../../Benchmarks/Time Series Data/Car_Simulation/'
-    #data_file_name = 'Car_RollOverData_1_6D.csv'
-    #fields_file_name = 'rollover_fields.csv'
-
-    #file_path = '../../Nan_Traffic_Simulator/anomalous_data/'
-    #data_file_name = 'anomalous_2.csv'
-    #fields_file_name = 'traffic_fields.csv'
-
-    #file_path = '../originalEwIDCAD/'
-    #data_file_name = 'S1.csv'
-    #fields_file_name = 'S_fields.csv'
 
     normal_data = read_data(file_path + data_file_name)
     fields = read_fields(file_path + fields_file_name)
@@ -109,7 +104,7 @@ if __name__ == '__main__':
         # classify the new instance, f is the cluster label
         distance, index = find_min_distance(clusters, new_instance)
         f = clusters[index].classify(index, distance, new_instance, classify_type) 
-        print "mahalanobis distance is:", distance
+       # print "mahalanobis distance is:", distance
 
         if f == np.inf: # add new anomaly to a temperal anomaly list.
             if i > stablization:
@@ -126,8 +121,9 @@ if __name__ == '__main__':
             j = 0
             tmp_index = None
         if j > cum_anomalies: # if there are consecutive anomalies
-            print"the anomalies are: ", anomalies
+            #print"the anomalies are: ", anomalies
             big_anomalies_index = np.vstack([big_anomalies_index, tmp_index])
+            tmp_index = None
         if algorithm == 'ewIDCAD':
             _,_ = clusters[index].update_ewIDCAD(new_instance)
         elif algorithm == 'ffIDCAD':
@@ -147,6 +143,11 @@ if __name__ == '__main__':
     print '# of clusters is: ', num_clusters
     print '# of anomalies is: ', num_anomalies
     print '# of big anomalies is: ', num_big_anomalies
+    indexFile = open(data_name+'_result.csv', 'a')
+    writer = csv.writer(indexFile, delimiter=',')
+    writer.writerow(anomalies_index[1:].ravel())
+    indexFile.close
+    print 'anomalies_index', anomalies_index
     print big_anomalies_index
     
     # plot results

@@ -173,7 +173,7 @@ if __name__ == '__main__':
                 print "It's two separated!"
                 mean = np.mean(B, 0)
                 cov_inv = np.linalg.pinv(np.cov(B.T))
-                clusters.append(cluster(B, alpha, beta, _lambda, mean, cov_inv, gamma, tmp, init_type))
+                clusters.append(cluster(B, alpha, beta, _lambda, mean, cov_inv, gamma, init_type))
                 B = None
 
 # -------------------------------------------------------------------------

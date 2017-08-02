@@ -1,0 +1,1 @@
+Time,x_dot_ego,v_east,v_north,v_vertical,accel_x,accel_y,accel_z,yaw,pitch,roll,P_rate,Q_rate,R_rate,x_obs,y_obs,x_dot_obs,x_ddot_obs,w_obs,l_obs,left_dist,right_dist,left_conf,right_conf,left_type,right_type,left_heading,right_heading,left_curvature,right_curvature,curvature

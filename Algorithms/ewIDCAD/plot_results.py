@@ -23,12 +23,15 @@ class plot_results():
         # plot original data with big anomalies
         plt.figure(2)
         num_clusters = len(self.clusters)
+        plots = [None]*2
         for j in range (0,num_clusters):
-            plt.plot(self.clusters[j].elements[:,x], self.clusters[j].elements[:,y],'g*')
-        plt.plot(self.normal_data[self.big_anomalies_index,x], self.normal_data[self.big_anomalies_index,y], 'ro')
-        plt.title('Original data with big anomalies')
+            plots[0], = plt.plot(self.clusters[j].elements[:,x], self.clusters[j].elements[:,y],'go', label = 'Normal data')
+        #plots[1], = plt.plot(self.normal_data[self.big_anomalies_index,x], self.normal_data[self.big_anomalies_index,y], 'ro', label = 'Detected outliers')
+        plots[1], = plt.plot(self.normal_data[self.anomalies_index[1:],x], self.normal_data[self.anomalies_index[1:],y], 'ro', label = 'Detected outliers')
+        #plt.title('Original data with all anomalies')
         plt.xlabel(self.fields[x])
         plt.ylabel(self.fields[y])
+        plt.legend(handles = plots)
         
         # plot original data with big anomalies
         plt.figure(3)
@@ -37,14 +40,17 @@ class plot_results():
         color[:,0] = np.array(range(0, self.num_sensors))/(self.num_sensors-1) #R
         color[:,1] = (np.array(range(self.num_sensors, 0, -1))-1)/(self.num_sensors-1) #G
         color[:,2] = (np.array(range(self.num_sensors, 0, -1))-1)/(self.num_sensors-1) #B
-        color = ['y','m','c','k','g','b']
+        color = ['y','m','c','k','g','b','r','m']
+        #color = ['b','r','y','m']
         for i in range (0, len(self.fields)):
             plots[i], = plt.plot(range(0,self.num_seqs-self.start),self.normal_data[:,i],color = color[i], label = self.fields[i])
             plt.plot(self.big_anomalies_index, self.normal_data[self.big_anomalies_index,i],'ro')
-        plt.title('Original data with big anomalies')
+            #plt.plot(self.anomalies_index, self.normal_data[self.anomalies_index,i],'ro')
+        #plt.title('Original data with big anomalies')
         plt.xlabel('Time step')
         plt.ylabel('Data Magnitude')
-        #plt.legend(handles = plots)
+        plt.xlim([0,350])
+        plt.legend(handles = plots)
         
         # plot original data with all anomalies
         plt.figure(4)
@@ -52,7 +58,7 @@ class plot_results():
         for i in range (0, len(self.fields)):
             plots[i], = plt.plot(range(0,self.num_seqs-self.start),self.normal_data[:,i],color = color[i], label = self.fields[i])
             plt.plot(self.anomalies_index[1:], self.normal_data[self.anomalies_index[1:],i],'ro')
-        plt.title('Original data with all anomalies')
+        #plt.title('Original data with all anomalies')
         plt.xlabel('Time step')
         plt.ylabel('Data Magnitude')
         #plt.legend(handles = plots)

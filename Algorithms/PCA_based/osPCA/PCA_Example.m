@@ -1,9 +1,11 @@
 function PCA_Example()
     clear;clc;
     filepath = '../../../benchmarks/Time Series Data/NASA Shuttle Valve Data/unseenSeqs.data.csv';
+    filepath = '../../../Nan_Traffic_Simulator/05172017_data/anomalous_17D_1.csv'
     data = csvread(filepath);
+    data = data';
     beta = 0.9; % k for knn
-    pca_scores = OD_onlinePCA(data', beta);
+    [index, pca_scores, u] = OD_onlinePCA(data', beta);
     pca_idx = 1:length(pca_scores);
     figure(1);
     plot(pca_idx, pca_scores);

@@ -48,6 +48,9 @@ class cluster():
         self.cov_inv = np.eye(len(cov))
         self.gamma = gamma
 
+        print "init mean is:", self.mean
+        print "init cov_inv is:", self.cov_inv
+        #input('Press Enter to continue...')
 
         # parameters for model reset
         self.sigma = 1
@@ -80,6 +83,14 @@ class cluster():
         #               (1-self.sigma**self.overlap_flag) * np.eye(len(self.cov_inv)) 
         # save the trajectory of means and covs
 
+        #print "updated mean is:", self.mean
+        #print "updated cov_inv is:", self.cov_inv
+        #if self.k >=800:
+        #    input('Press Enter to continue...')
+        #self.k += 1
+        #if np.isnan(self.mean[0]):
+        #    input('Press Enter to continue...')
+
         meanfile = open('new_mean.csv', 'a')
         writer = csv.writer(meanfile, delimiter = ',')
         writer.writerow(self.mean)
@@ -95,14 +106,17 @@ class cluster():
     def update_ffIDCAD(self, x):
         # here x should be 1*W array where W is the number of features
         self.elements = np.vstack([self.elements, x])
-        self.k += 1
-        # update mean
-        self.mean = self._lambda*self.mean + (1-self._lambda)*x
+
         # update inverse of covariance
         diff = (x-self.mean)[None] # make it to be 2D array, 1*2
         num = np.dot(np.dot(diff.T, diff), self.cov_inv)
         den = (self.k-1)/self._lambda + np.dot(np.dot(diff, self.cov_inv), diff.T)
-        self.cov_inv = (self.k*self.cov_inv/(self._lambda*(self.k-1))) * (np.eye(len(self.mean)) - num / den )
+        self.cov_inv = np.dot((self.k*self.cov_inv/(self._lambda*(self.k-1))),\
+                (np.eye(len(self.mean)) - num / den ))
+
+        # update mean
+        self.mean = self._lambda*self.mean + (1-self._lambda)*x
+        self.k += 1
         #self.cov_inv = (self.sigma**self.overlap_flag) * self.cov_inv + \
         #               (1-self.sigma**self.overlap_flag) * np.eye(len(self.cov_inv)) 
         #  save the trajectory of means and covs
@@ -121,14 +135,17 @@ class cluster():
     def update_IDCAD(self, x):
         # here x should be 1*W array where W is the number of features
         self.elements = np.vstack([self.elements, x])
-        self.k += 1
-        # update mean
-        self.mean = self.mean+(1/(self.k+1))*(x-self.mean)
+
+
         # update inverse of covariance
         diff = (x-self.mean)[None] # make it to be 2D array, 1*2
         num = np.dot(np.dot(diff.T, diff), self.cov_inv)
         den = (self.k**2-1)/self.k + np.dot(np.dot(diff, self.cov_inv), diff.T)
-        self.cov_inv = (self.k*self.cov_inv/(self.k-1)) * (np.eye(len(self.mean)) - num / den )
+        self.cov_inv = np.dot((self.k*self.cov_inv/(self.k-1)), \
+                (np.eye(len(self.mean)) - num / den ))
+        # update mean
+        self.mean = self.mean+(1/(self.k+1))*(x-self.mean)
+        self.k += 1
         #self.cov_inv = (self.sigma**self.overlap_flag) * self.cov_inv + \
         #               (1-self.sigma**self.overlap_flag) * np.eye(len(self.cov_inv)) 
         #  save the trajectory of means and covs

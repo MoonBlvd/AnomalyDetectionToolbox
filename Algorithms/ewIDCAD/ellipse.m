@@ -105,7 +105,7 @@ if strcmp(Type,'2D'),
 %     end
     
     hold on;
-    plot(C(1),C(2),'b*');
+    %plot(C(1),C(2),'b*');
 %     axis equal grid
 else
     mesh(XX,YY,ZZ);

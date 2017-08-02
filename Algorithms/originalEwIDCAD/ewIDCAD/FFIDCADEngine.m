@@ -2,11 +2,22 @@ clear;clc;
 load data
 %IBRL18=csvread('../../../Benchmarks/Time Series Data/IBRL/IBRL_18_25000-28800_temp_hum.csv');
 GSB12=csvread('../../../Benchmarks/Time Series Data/GSB/GSB_12_Oct_temp_humi_mean.csv');
+%GSB12=csvread('../../../Benchmarks/Time Series Data/S2/S2.csv');
+% anomalyID = [11,56,116,167,177,178,179,199];
+% normalID = [1:200];
+% normalID(anomalyID) = [];
+% plot(GSB12(anomalyID,1), GSB12(anomalyID,2),'ro');hold on;
+% plot(GSB12(normalID,1), GSB12(normalID,2),'bo');
+% xlim([0,60]);ylim([0,35]);
+
+
+
+
 D=2;
 Ts=0.98; % gamma
 Threshold1 = chi2inv(Ts,D);
-Isplot=1;
-Reduced = GSB12;%IBRL18;%LG18;%
+Isplot=0;
+Reduced = GSB12;%IBRL18;%LG18;
 
 %Reduced1 = [[0:0.1:30]', rand(301,1)];
 %Reduced2 = [31*ones(1000,1), rand(1000,1)];%+rand(1000,1)/2-1
@@ -40,7 +51,11 @@ for i=firstinitdepth+1:1:n
     if(InaRow1>CA)
             AnomalyIndex3(i)=1; % Significant changes
     end
+    x = Reduced(i,1:D);
      [TrackerA,TrackerC,wSum,wPowerSum]= FFIDCADExact(TrackerA, TrackerC,Lambda,wSum,wPowerSum, Reduced(i,1:D));
+    %if isnan(TrackerC(1))
+    %    break;
+    %end
     if(Isplot==1)
          if(mod(i,100)==0)
             plot(Reduced(1:i,1),Reduced(1:i,2),'b.','MarkerSize',6);
@@ -50,10 +65,17 @@ for i=firstinitdepth+1:1:n
             close all;
          end
     end
+    if i == 584
+        tawd = 213;
+    end
 end
 
 plot([1:size(Reduced,1)], Reduced(:,1),'g*');hold on;
 plot([1:size(Reduced,1)], Reduced(:,2),'g*');hold on;
 plot(find(AnomalyIndex3==1), Reduced(find(AnomalyIndex3==1),1),'ro'); hold on;
 plot(find(AnomalyIndex3==1), Reduced(find(AnomalyIndex3==1),2),'ro'); hold on;
+INDEX = find(AnomalyIndex3 == 1);
 
+figure(2)
+plot(Reduced(:,1),Reduced(:,2),'go');hold on;
+plot(Anomalies1(:,1), Anomalies1(:,2),'ro');

@@ -1,6 +1,6 @@
 %Load test data
-data = csvread('..\benchmarks\PointAnomaly\Point Anomaly Synthetic\PointAnomalySyntheticData.csv');
-label = csvread('..\benchmarks\PointAnomaly\Point Anomaly Synthetic\PointAnomalySyntheticLabel.csv');
+data = csvread('../../../Benchmarks/Vector Data/Point Anomaly Synthetic/PointAnomalySyntheticData.csv');
+label = csvread('../../../Benchmarks/Vector Data/Point Anomaly Synthetic/PointAnomalySyntheticLabel.csv');
 
 
 process_lof(data, label, 5, 1)

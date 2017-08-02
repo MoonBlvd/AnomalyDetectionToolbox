@@ -53,8 +53,8 @@ try
         lof(i) = sum(lrd_value(k_index{i})/lrd_value(i))/numneigh(i);
     end
     %Indices from sorting lof are the suspicious score rankings
-    [~,suspicious_index]=sort(lof,'descend');
-    
+    [sorted_lof,suspicious_index]=sort(lof,'descend');
+    a = 5;
 catch err
     if (strcmp(err.message, 'Invalid parameter name: IncludeTies.'))
         warning('MATLAB:LOF', 'Matlab not newest version? Falling back to old version.')
