@@ -4,14 +4,15 @@ function PCA_Example()
     %filepath = '../../../Nan_Traffic_Simulator/05172017_data/anomalous_17D_1.csv'
     %file_path = '../../../../Advanced_car_anomaly_detection/data/05182017_IMU_data_7D.csv';
     % roll	pitch	P	Q	R	v_vertical	accel_z
-    file_path = '../../../../Advanced_car_anomaly_detection/data/05182017_IMU_data_14D.csv';
+%     file_path = '../../../../Advanced_car_anomaly_detection/data/05182017_IMU_data_14D.csv';
     % lat	long	roll	pitch	yaw	P	Q	R	v_north	v_east	v_vertical	accel_x	accel_y	accel_z
+    file_path='../../../../Smart_Black_Box/data/Data_10172017_freeway/MIDG.csv';
     data = csvread(file_path);
     mean_data = mean(data);
     var_data = var(data);
     
     figure(1)
-    plot(1:size(data,1),data(:,14));
+    plot(1:size(data,1),data(:,16));
     
     window_size = 10;
     for i = 1:size(data,1)-window_size
@@ -70,5 +71,5 @@ function PCA_Example()
 %     plot(wpca_idx, wpca_scores);
 %     [M, idx] = max(wpca_scores);
 %     point = 1;
-    csvwrite('IMU_score_pca_0.01.csv',pca_scores)
+    csvwrite('aaaaa.csv',pca_scores)
 end
